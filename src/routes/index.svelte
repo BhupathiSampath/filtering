@@ -19,6 +19,9 @@
 		search='',
 		page = 1,
 		prev = '',
+		start_date = '',
+		end_date = '',
+		days = 36500,
 		next = ''
 	async function submit(page) {
 		if (page>1) {
@@ -28,7 +31,7 @@
 			next = page+1;
 		};
 		const res = await fetch(
-			`${import.meta.env.VITE_BASE_URL}/api/data1/?date=${date}&page=${page}&lineage=${lineage}&gene=${gene}&mutation=${mutation}&reference_id=${reference_id}&strain=${strain}&amine_acid_position=${amine_acid_position}&search=${search}`,
+			`${import.meta.env.VITE_BASE_URL}/api/data1/?days=${days}&start_date=${start_date}&end_date=${end_date}&date=${date}&page=${page}&lineage=${lineage}&gene=${gene}&mutation=${mutation}&reference_id=${reference_id}&strain=${strain}&amine_acid_position=${amine_acid_position}&search=${search}`,
 			{
 				headers: { 'content-type': 'application/json' }
 			}
@@ -54,7 +57,7 @@
 	  });
 
 	onMount(async () => {
-		const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/data1/`, {
+		const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/data1/?days=${days}`, {
 			headers: { 'Content-Type': 'application/json' },
 			credentials: 'include'
 		})
@@ -91,7 +94,7 @@
 
 	async function download() {
 		const res = await fetch(
-			`${import.meta.env.VITE_BASE_URL}/api/exportcsv/?date=${date}&lineage=${lineage}&gene=${gene}&mutation=${mutation}&reference_id=${reference_id}&strain=${strain}&amine_acid_position=${amine_acid_position}&search=${search}`,
+			`${import.meta.env.VITE_BASE_URL}/api/exportcsv/?start_date=${start_date}&end_date=${end_date}&date=${date}&lineage=${lineage}&gene=${gene}&mutation=${mutation}&reference_id=${reference_id}&strain=${strain}&amine_acid_position=${amine_acid_position}&search=${search}`,
 			{
 				headers: { 'content-type': 'application/json' }
 			}
@@ -150,13 +153,6 @@
 						    <input bind:value={page} type="text" name="strain" />
                         </div>
 					</div>
-				<div class="column-2" hidden>
-					<!-- svelte-ignore a11y-label-has-associated-control -->
-					<label class="lable">DATE:</label>
-					<div>
-						<input bind:value={date} type="text" name="date" />
-					</div>
-				</div> 
 				<div class="column-2">
 					<!-- svelte-ignore a11y-label-has-associated-control -->
 					<label class="lable">STRAIN:</label>
@@ -199,13 +195,6 @@
 						<input bind:value={mutation} type="text" name="mutation" />
 					</div>
 				</div>
-				<div class="column-2" hidden>
-					<!-- svelte-ignore a11y-label-has-associated-control -->
-					<label class="lable">SEARCH BY KEY WORD:</label>
-					<div>
-						<input bind:value={search} type="text" name="search" />
-					</div>
-				</div>
 			</div><br>
 			<div class="columns is-centered mb-0">
 				<div class="column-2">
@@ -223,6 +212,36 @@
 						<input bind:value={search} type="text" name="search" />
 					</div>
 				</div>
+				<div class="column-2">
+					<!-- svelte-ignore a11y-label-has-associated-control -->
+					<label class="lable">From Date:</label>
+					<div>
+						<input bind:value={start_date} type="text" name="start_date"/>
+						<!-- <input name=x size=10 maxlength=10  onkeyup="this.value=this.value.replace(/^(\d\d)(\d)$/g,'$1/$2').replace(/^(\d\d\/\d\d)(\d+)$/g,'$1/$2').replace(/[^\d\/]/g,'')"> -->
+					</div>
+				</div> 
+				<div class="column-2">
+					<!-- svelte-ignore a11y-label-has-associated-control -->
+					<label class="lable">To Date:</label>
+					<div>
+						<input bind:value={end_date} type="text" name="end_date"/>
+						<!-- <input name=x size=10 maxlength=10  onkeyup="this.value=this.value.replace(/^(\d\d)(\d)$/g,'$1/$2').replace(/^(\d\d\/\d\d)(\d+)$/g,'$1/$2').replace(/[^\d\/]/g,'')"> -->
+					</div>
+				</div>
+				<div class="column-2">
+					<!-- svelte-ignore a11y-label-has-associated-control -->
+					<label class="lable">Recent Data:</label>
+					<div>
+						<select bind:value={days} name="days"> 
+							<option value={days}>All data</option>
+							<option value="7">Last week</option>
+							<option value="30">Last month</option>
+							<option value="182">Last months</option>
+							<option value="365">This year</option>
+						</select>
+						<!-- <input name=x size=10 maxlength=10  onkeyup="this.value=this.value.replace(/^(\d\d)(\d)$/g,'$1/$2').replace(/^(\d\d\/\d\d)(\d+)$/g,'$1/$2').replace(/[^\d\/]/g,'')"> -->
+					</div>
+				</div>
 			<div class="column-6">
 				<!-- svelte-ignore a11y-label-has-associated-control -->
 				<label class="lable">...</label>
@@ -235,8 +254,9 @@
 	</div>
 </div>
 <div class="box">
-	<div>
-	<button on:click={download}>Download</button>
+	<div class="container has-text-right">
+		<input class="slider is-fullwidth is-info" step="1" min="0" max="100" value="0" type="range">
+	Export data to csv: <button on:click={download}>Export</button></div>
 	<div class="column">
 		<!-- <section class="hero"> -->
 		<!-- <div class="hero-body"> -->
