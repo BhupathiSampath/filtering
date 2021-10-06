@@ -1,6 +1,7 @@
 <script>
+	import MultiSelect from './sorting.svelte';
 	import { writable, derived } from 'svelte/store';
-	export const apiData = writable([]);
+	export let apiData = writable([]);
 	export const apiData1 = writable([]);
 	export const Data = derived(apiData, ($apiData) => {
 		console.log($apiData);
@@ -22,7 +23,8 @@
 		start_date = '',
 		end_date = '',
 		days = 36500,
-		next = ''
+		next = '',
+		ordering = ''
 	async function submit(page) {
 		if (page>1) {
 			prev = page-1;
@@ -31,7 +33,7 @@
 			next = page+1;
 		};
 		const res = await fetch(
-			`${import.meta.env.VITE_BASE_URL}/api/data1/?days=${days}&start_date=${start_date}&end_date=${end_date}&date=${date}&page=${page}&lineage=${lineage}&gene=${gene}&mutation=${mutation}&reference_id=${reference_id}&strain=${strain}&amine_acid_position=${amine_acid_position}&search=${search}`,
+			`${import.meta.env.VITE_BASE_URL}/api/data1/?ordering=${ordering}&days=${days}&start_date=${start_date}&end_date=${end_date}&date=${date}&page=${page}&lineage=${lineage}&gene=${gene}&mutation=${mutation}&reference_id=${reference_id}&strain=${strain}&amine_acid_position=${amine_acid_position}&search=${search}`,
 			{
 				headers: { 'content-type': 'application/json' }
 			}
@@ -110,6 +112,18 @@
 			});
 	}
 
+    onMount(() => {
+		var days = document.getElementById('days');
+		var customInput = document.getElementById('customInput');
+
+		days.addEventListener('change', function(){
+			if(this.value == "custom") {
+				customInput.classList.remove('hide');
+			} else {
+				customInput.classList.add('hide');
+			}
+		})
+  });
 </script>
 
 <!-- <p>total_pages:{($apiData.count / 100 + 1) ^ 0}</p> -->
@@ -155,119 +169,155 @@
 					</div>
 				<div class="column-2">
 					<!-- svelte-ignore a11y-label-has-associated-control -->
-					<label class="lable">STRAIN:</label>
+					<!-- <label class="lable">STRAIN:</label> -->
 					<div>
-						<input bind:value={strain} type="text" name="strain" />
+						<input bind:value={strain} type="text" name="strain" placeholder="Strain"/>
 					</div>
 				</div>
 				<div class="column-2">
 					<!-- svelte-ignore a11y-label-has-associated-control -->
-					<label class="lable">LINEAGE:</label>
+					<!-- <label class="lable">LINEAGE:</label> -->
 					<div>
-						<input bind:value={lineage} type="text" name="lineage" />
+						<input bind:value={lineage} type="text" name="lineage" placeholder="Lineage"/>
 					</div>
 				</div>
 				<div class="column-2">
 					<!-- svelte-ignore a11y-label-has-associated-control -->
-					<label class="lable">GENE:</label>
+					<!-- <label class="lable">GENE:</label> -->
 					<div>
-						<input bind:value={gene} type="text" name="gene" />
+						<input bind:value={gene} type="text" name="gene" placeholder="Gene"/>
 					</div>
 				</div>
 				<div class="column-2">
 					<!-- svelte-ignore a11y-label-has-associated-control -->
-					<label class="lable">REFERENCE:</label>
+					<!-- <label class="lable">REFERENCE:</label> -->
 					<div>
-						<input bind:value={reference_id} type="text" name="reference_id" />
+						<input bind:value={reference_id} type="text" name="reference_id" placeholder="Reference"/>
 					</div>
 				</div>
 				<div class="column-2">
 					<!-- svelte-ignore a11y-label-has-associated-control -->
-					<label class="lable">AA POSITION:</label>
+					<!-- <label class="lable">AA POSITION:</label> -->
 					<div>
-						<input bind:value={amine_acid_position} type="text" name="amine_acid_position" />
+						<input bind:value={amine_acid_position} type="text" name="amine_acid_position" placeholder="AA Position"/>
 					</div>
 				</div>
 				<div class="column-2">
 					<!-- svelte-ignore a11y-label-has-associated-control -->
-					<label class="lable">MUTATION:</label>
+					<!-- <label class="lable">MUTATION:</label> -->
 					<div>
-						<input bind:value={mutation} type="text" name="mutation" />
+						<input bind:value={mutation} type="text" name="mutation" placeholder="Mutation"/>
 					</div>
 				</div>
 			</div><br>
 			<div class="columns is-centered mb-0">
 				<div class="column-2">
 					<!-- svelte-ignore a11y-label-has-associated-control -->
-					<label class="lable">DATE:</label>
+					<!-- <label class="lable">DATE:</label> -->
 					<div>
-						<input bind:value={date} type="text"/>
+						<input bind:value={date} type="text" placeholder="yyyy-mm-dd"/>
 						<!-- <input name=x size=10 maxlength=10  onkeyup="this.value=this.value.replace(/^(\d\d)(\d)$/g,'$1/$2').replace(/^(\d\d\/\d\d)(\d+)$/g,'$1/$2').replace(/[^\d\/]/g,'')"> -->
 					</div>
 				</div> 
 				<div class="column-2">
 					<!-- svelte-ignore a11y-label-has-associated-control -->
-					<label class="lable">SEARCH BY KEY WORD:</label>
+					<!-- <label class="lable">SEARCH BY KEY WORD:</label> -->
 					<div>
-						<input bind:value={search} type="text" name="search" />
+						<input bind:value={search} type="text" name="search" placeholder="Search by key word"/>
 					</div>
 				</div>
 				<div class="column-2">
 					<!-- svelte-ignore a11y-label-has-associated-control -->
-					<label class="lable">From Date:</label>
+					<!-- <label class="lable">From Date:</label> -->
 					<div>
-						<input bind:value={start_date} type="text" name="start_date"/>
+						<input bind:value={start_date} type="text" placeholder="yyyy-mm-dd(from)" name="start_date"/>
 						<!-- <input name=x size=10 maxlength=10  onkeyup="this.value=this.value.replace(/^(\d\d)(\d)$/g,'$1/$2').replace(/^(\d\d\/\d\d)(\d+)$/g,'$1/$2').replace(/[^\d\/]/g,'')"> -->
 					</div>
 				</div> 
 				<div class="column-2">
 					<!-- svelte-ignore a11y-label-has-associated-control -->
-					<label class="lable">To Date:</label>
+					<!-- <label class="lable">To Date:</label> -->
 					<div>
-						<input bind:value={end_date} type="text" name="end_date"/>
+						<input bind:value={end_date} type="text" placeholder="yyyy-mm-dd(to)" name="end_date"/>
 						<!-- <input name=x size=10 maxlength=10  onkeyup="this.value=this.value.replace(/^(\d\d)(\d)$/g,'$1/$2').replace(/^(\d\d\/\d\d)(\d+)$/g,'$1/$2').replace(/[^\d\/]/g,'')"> -->
 					</div>
 				</div>
 				<div class="column-2">
 					<!-- svelte-ignore a11y-label-has-associated-control -->
-					<label class="lable">Recent Data:</label>
+					<!-- <label class="lable">Recent Data:</label> -->
 					<div>
-						<select bind:value={days} name="days"> 
-							<option value={days}>All data</option>
+						<select id="days" bind:value={days} name="days"> 
+							<option value="36500">All data</option>
 							<option value="7">Last week</option>
 							<option value="30">Last month</option>
 							<option value="182">Last months</option>
 							<option value="365">This year</option>
+							<option value="custom">Custom</option>
 						</select>
-						<!-- <input name=x size=10 maxlength=10  onkeyup="this.value=this.value.replace(/^(\d\d)(\d)$/g,'$1/$2').replace(/^(\d\d\/\d\d)(\d+)$/g,'$1/$2').replace(/[^\d\/]/g,'')"> -->
+						<input bind:value={days} type="text" class="hide" placeholder="Custom Selector" name="custom" id="customInput">
 					</div>
 				</div>
 			<div class="column-6">
 				<!-- svelte-ignore a11y-label-has-associated-control -->
-				<label class="lable">...</label>
+				<!-- <label class="lable">...</label> -->
 				<div>
 					<input type="button" on:click={submit(page)} value="Get Data" />
 				</div>
 			</div>
+			
 		</div>
+		</div>
+		<div class="columns is-centered is-offset-4 mt-0 pt-0">
+			<div class="column-6 is-offset-4 mt-0 pt-0">
+				
+				<!-- svelte-ignore a11y-label-has-associated-control -->
+				<label class="lable">Sort your Data</label>
+				<div class="column-2 is-offset-4 mt-0 pt-0">
+					<MultiSelect id='lang' bind:value={ordering} name="ordering">
+						<option value=""></option>
+						<option value="id">Id Ascending order</option>
+						<option value="-id">Id Descending order</option>
+						<option value="date">Date Ascending order</option>
+						<option value="-date">Date Descending order</option>
+						<option value="strain">Strain Ascending order</option>
+						<option value="-strain">Strain Descending order</option>
+						<option value="lineage">Lineage Ascending order</option>
+						<option value="-lineage">Lineage Descending order</option>
+						<option value="mutation">Mutation Ascending order</option>
+						<option value="-mutation">Mutation Descending order</option>
+						<option value="reference_id">Reference Ascending order</option>
+						<option value="-reference_id">Reference Descending order</option>
+						<option value="gene">Gene Ascending order</option>
+						<option value="-gene">Gene Descending order</option>
+						<option value="amine_acid_position">AA Position Ascending order</option>
+						<option value="-amine_acid_position">AA Position Descending order</option>
+					</MultiSelect>
+				</div>
+			</div>
+			<div class="column-6 is-offset-4 mt-0 pt-0">
+				<!-- svelte-ignore a11y-label-has-associated-control -->
+				<!-- <label class="lable">...</label> -->
+				<div class="column-6 is-offset-4 mt-0 pt-0">
+					<input type="button" on:click={submit(page)} value="Sort Data" />
+				</div>
+			</div>
 		</div>
 	</div>
 </div>
 <div class="box">
 	<div class="container has-text-right">
-		<input class="slider is-fullwidth is-info" step="1" min="0" max="100" value="0" type="range">
 	Export data to csv: <button on:click={download}>Export</button></div>
 	<div class="column">
 		<!-- <section class="hero"> -->
 		<!-- <div class="hero-body"> -->
-		<p class="has-text-info">TOTAL RECORDS = {$apiData.count}</p>
-		<div class="table-container is-filterable">
+		<p class="has-text-success">TOTAL RECORDS = {$apiData.count}</p>
+		<div class="table-container sortable">
 			<table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
-				<thead id="head" class="has-text-centered">
+				<thead id="head" class="has-text-centered is-sortable">
 					<tr>
-						<th rowspan="2">ID</th>
+						<th rowspan="2" on:click={submit}>ID</th>
 						<th rowspan="2">DATE</th>
-						<th rowspan="2">STRAIN</th>
+						<th rowspan="2" on:click={submit(page)} value={ordering="-string"}>STRAIN</th>
 						<th rowspan="2">LINEAGE</th>
 						<th rowspan="2">GENE</th>
 						<th rowspan="2">REFERENCE</th>
@@ -294,30 +344,32 @@
 		</div>
 	</div>
 </div>
-
+<!-- {#if page>1}
+<div class="container has-text-centered">{page} out of {($apiData.count / 100 + 1) ^ 0 } pages</div>
+{/if} -->
+{#if page>1}
+<div class="container has-text-centered">{next-1} out of {($apiData.count / 100 + 1) ^ 0 } pages</div>
+{:else}
+<div class="container has-text-centered">{page} out of {($apiData.count / 100 + 1) ^ 0 } pages</div>
+{/if}
 <nav class="pagination is-centered" role="navigation" aria-label="pagination">
 	<ul class="pagination-list">
 		{#if page>1}
 		<li class="pagination-link" aria-label="Goto page" data-color="black" on:click={submit(page=prev)}>
 			Prev page
 		</li>
-		{/if} 
 		<li class="pagination-link" aria-label="Goto page" data-color="black" on:click={submit(page=1)}>
 			First page
 		</li> 
-		<!-- {#each {length: prev} as _, i}
-		<li class="pagination-link" aria-label="Goto page" data-color="black" on:click={submit(page=(i+1))}>
-			{i+1}
-		</li>
-		{/each} -->
+		{/if} 
 		{#if page>=1 && page<(($apiData.count / 100 + 1) ^ 0)}
 		<li class="pagination-link" aria-label="Goto page" data-color="black" on:click={submit(page=page+1)}>
 			Next page
 		</li>
 		 {/if}
+		
 	</ul>
 </nav>
-{page}
 <!-- <div class="has-text-centered">
 	<div class="column-2"> -->
 		<!-- svelte-ignore a11y-label-has-associated-control -->
