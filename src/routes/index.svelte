@@ -25,13 +25,9 @@
 		days = 36500,
 		next = '',
 		ordering = ''
+
+	
 	async function submit(page) {
-		if (page>1) {
-			prev = page-1;
-		};
-		if (page<($apiData.count)) {
-			next = page+1;
-		};
 		const res = await fetch(
 			`${import.meta.env.VITE_BASE_URL}/api/data1/?ordering=${ordering}&days=${days}&start_date=${start_date}&end_date=${end_date}&date=${date}&page=${page}&lineage=${lineage}&gene=${gene}&mutation=${mutation}&reference_id=${reference_id}&strain=${strain}&amine_acid_position=${amine_acid_position}&search=${search}`,
 			{
@@ -96,7 +92,7 @@
 
 	async function download() {
 		const res = await fetch(
-			`${import.meta.env.VITE_BASE_URL}/api/exportcsv/?start_date=${start_date}&end_date=${end_date}&date=${date}&lineage=${lineage}&gene=${gene}&mutation=${mutation}&reference_id=${reference_id}&strain=${strain}&amine_acid_position=${amine_acid_position}&search=${search}`,
+			`${import.meta.env.VITE_BASE_URL}/api/exportcsv/?ordering=${ordering}&days=${days}&start_date=${start_date}&end_date=${end_date}&date=${date}&page=${page}&lineage=${lineage}&gene=${gene}&mutation=${mutation}&reference_id=${reference_id}&strain=${strain}&amine_acid_position=${amine_acid_position}&search=${search}`,
 			{
 				headers: { 'content-type': 'application/json' }
 			}
@@ -112,18 +108,18 @@
 			});
 	}
 
-    onMount(() => {
-		var days = document.getElementById('days');
-		var customInput = document.getElementById('customInput');
+//     onMount(() => {
+// 		var days = document.getElementById('days');
+// 		var customInput = document.getElementById('customInput');
 
-		days.addEventListener('change', function(){
-			if(this.value == "custom") {
-				customInput.classList.remove('hide');
-			} else {
-				customInput.classList.add('hide');
-			}
-		})
-  });
+// 		days.addEventListener('change', function(){
+// 			if(this.value == "custom") {
+// 				customInput.classList.remove('hide');
+// 			} else {
+// 				customInput.classList.add('hide');
+// 			}
+// 		})
+//   });
 </script>
 
 <!-- <p>total_pages:{($apiData.count / 100 + 1) ^ 0}</p> -->
@@ -244,17 +240,24 @@
 				</div>
 				<div class="column-2">
 					<!-- svelte-ignore a11y-label-has-associated-control -->
-					<!-- <label class="lable">Recent Data:</label> -->
+					
 					<div>
-						<select id="days" bind:value={days} name="days"> 
-							<option value="36500">All data</option>
+						<label class="lable">Recent Data:</label>
+						<select id="days" bind:value={days} name="days">
+							<option value=36500>All data</option>
 							<option value="7">Last week</option>
+							<option value="14">Last 2week</option>
+							<option value="21">Last 3week</option>
 							<option value="30">Last month</option>
-							<option value="182">Last months</option>
+							<option value="60">Last 2month</option>
+							<option value="90">Last 3month</option>
+							<option value="120">Last 4month</option>
+							<option value="150">Last 5month</option>
+							<option value="182">Last 6months</option>
 							<option value="365">This year</option>
-							<option value="custom">Custom</option>
+							<!-- <option value="custom">Custom</option> -->
 						</select>
-						<input bind:value={days} type="text" class="hide" placeholder="Custom Selector" name="custom" id="customInput">
+						<!-- <input bind:value={days} type="text" class="hide" placeholder="Custom Selector" name="custom" id="customInput"> -->
 					</div>
 				</div>
 			<div class="column-6">
@@ -269,7 +272,6 @@
 		</div>
 		<div class="columns is-centered is-offset-4 mt-0 pt-0">
 			<div class="column-6 is-offset-4 mt-0 pt-0">
-				
 				<!-- svelte-ignore a11y-label-has-associated-control -->
 				<label class="lable">Sort your Data</label>
 				<div class="column-2 is-offset-4 mt-0 pt-0">
@@ -412,3 +414,11 @@
 		{/each}
 	</ul>
 </nav> -->
+<style>
+    select:invalid{
+        color: gray;
+    }
+    option{
+        color: black;
+    }
+</style>
