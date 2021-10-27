@@ -70,7 +70,7 @@
 			prev = page - 1;
 		}
 		const res = await fetch(
-			`http://10.10.6.87/api/data1/?state=${state}&mutation_deletion=${mutation_deletion}&ordering=${ordering}&days=${days}&start_date=${start_date}&end_date=${end_date}&date=${date}&page=${page}&lineage=${lineage}&gene=${gene}&mutation=${mutation}&reference_id=${reference_id}&strain=${strain}&amino_acid_position=${amino_acid_position}&search=${search}`,
+			`http://10.10.6.87/api/data/?state=${state}&mutation_deletion=${mutation_deletion}&ordering=${ordering}&days=${days}&start_date=${start_date}&end_date=${end_date}&date=${date}&page=${page}&lineage=${lineage}&gene=${gene}&mutation=${mutation}&reference_id=${reference_id}&strain=${strain}&amino_acid_position=${amino_acid_position}&search=${search}`,
 			{
 				headers: { 'content-type': 'application/json' }
 			}
@@ -94,7 +94,7 @@
 		return [];
 	});
 	onMount(async () => {
-		const response = await fetch(`http://10.10.6.87/api/data1/?days=${days}`, {
+		const response = await fetch(`http://10.10.6.87/api/data/?days=${days}`, {
 			headers: { 'Content-Type': 'application/json' },
 			credentials: 'include'
 		})
@@ -206,7 +206,7 @@
 
 	async function get_download_link() {
 		const res = await fetch(
-			`http://10.10.6.87/api/exportcsv/?ordering=${ordering}&days=${days}&start_date=${start_date}&end_date=${end_date}&date=${date}&page=${page}&lineage=${lineage}&gene=${gene}&mutation=${mutation}&reference_id=${reference_id}&strain=${strain}&amino_acid_position=${amino_acid_position}&search=${search}`,
+			`http://10.10.6.87/api/exportcsv/?ordering=${ordering}&mutation_deletion=${mutation_deletion}&days=${days}&start_date=${start_date}&end_date=${end_date}&date=${date}&page=${page}&lineage=${lineage}&gene=${gene}&mutation=${mutation}&reference_id=${reference_id}&strain=${strain}&amino_acid_position=${amino_acid_position}&search=${search}`,
 			{
 				headers: { 'content-type': 'application/json' }
 			}
@@ -373,8 +373,8 @@
 			</div>
 			<br />
 			<div class="columns is-centered mb-0">
-				<button class="is-clickable" on:click={() => (child.shown = !child.shown)} style="color:blue"
-					>{child && child.shown ? 'Hide advance filter' : ' Show advance filter'}</button
+				<a class="is-clickable is-link" on:click={() => (child.shown = !child.shown)} style="color:blue"
+					>{child && child.shown ? 'Hide advance filter' : ' Show advance filter'}</a
 				>
 			</div>
 			{#if child && child.shown}
