@@ -5,5 +5,5 @@ const config = {
 		target: '#svelte'
 	}
 };
-
+  
 export default config;

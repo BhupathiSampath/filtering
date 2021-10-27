@@ -1,272 +1,456 @@
 <script>
-    import { onMount } from 'svelte';
-    import { fly } from 'svelte/transition';
-    export let id = '';
-    export let value = [];
-    export let readonly = false;
-    export let placeholder = '';
-  
-    let input, 
-      inputValue, 
-      options = [],
-      activeOption, 
-      showOptions = false,
-      selected = {},
-      first = true,
-      slot
-    const iconClearPath = 'M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z';
-  
-    onMount(() => {
-      slot.querySelectorAll('option').forEach(o => {
-        o.selected && !value.includes(o.value) && (value = [...value, o.value]);
-        options = [...options, {value: o.value, name: o.textContent}]
-      });
-      value && (selected = options.reduce((obj, op) => value.includes(op.value) ? {...obj, [op.value]: op} : obj, {}));
-      first = false;
-    });
-  
-    $: if (!first) value = Object.values(selected).map(o => o.value);
-    $: filtered = options.filter(o => inputValue ? o.name.toLowerCase().includes(inputValue.toLowerCase()) : o);
-    $: if (activeOption && !filtered.includes(activeOption) || !activeOption && inputValue) activeOption = filtered[0];
-  
-  
-    function add(token) {
-      if (!readonly) selected[token.value] = token;
-    }
-  
-    function remove(value) {
-      if (!readonly) {
-        const {[value]: val, ...rest} = selected;
-        selected = rest;
-      }
-    }
-  
-    function optionsVisibility(show) {
-      if (readonly) return;
-      if (typeof show === 'boolean') {
-        showOptions = show;
-        show && input.focus();
-      } else {
-        showOptions = !showOptions;
-      }
-      if (!showOptions) {
-        activeOption = undefined;
-      }
-    }
-  
-    function handleKeyup(e) {
-      if (e.keyCode === 13) {
-        Object.keys(selected).includes(activeOption.value) ? remove(activeOption.value) : add(activeOption);
-        inputValue = '';
-      }
-      if ([38,40].includes(e.keyCode)) { // up and down arrows
-        const increment = e.keyCode === 38 ? -1 : 1;
-        const calcIndex = filtered.indexOf(activeOption) + increment;
-        activeOption = calcIndex < 0 ? filtered[filtered.length - 1]
-          : calcIndex === filtered.length ? filtered[0]
-          : filtered[calcIndex];
-      }
-    }
-  
-    function handleBlur(e) {
-      optionsVisibility(false);
-    }
-  
-    function handleTokenClick(e) {
-      if (e.target.closest('.token-remove')) {
-        e.stopPropagation();
-        remove(e.target.closest('.token').dataset.id);
-      } else if (e.target.closest('.remove-all')) {
-        selected = [];
-        inputValue = '';
-      } else {
-        optionsVisibility(true);
-      }
-    }
-  
-    function handleOptionMousedown(e) {
-      const value = e.target.dataset.value;
-      if (selected[value]) {
-        remove(value);
-      } else {
-        add(options.filter(o => o.value === value)[0]);
-        input.focus();
-      }
-    }
-  </script>
-  
-  <style>
-    .multiselect {
-      background-color: white;
-      border-bottom: 1px solid hsl(0, 0%, 70%);
-      position: relative;
-    }
-    .multiselect:not(.readonly):hover {
-      border-bottom-color: hsl(0, 0%, 50%);
-    }
-  
-    .tokens {
-      align-items: center;
-      display: flex;
-      flex-wrap: wrap;
-      position: relative;
-    }
-    .tokens::after {    
-      background: none repeat scroll 0 0 transparent;
-      bottom: -1px;
-      content: "";
-      display: block;
-      height: 2px;
-      left: 50%;
-      position: absolute;
-      background: hsl(45, 100%, 51%);
-      transition: width 0.3s ease 0s, left 0.3s ease 0s;
-      width: 0;
-    }
-    .tokens.showOptions::after { 
-      width: 100%; 
-      left: 0; 
-    }
-    .token {
-      align-items: center;
-      background-color: hsl(214, 17%, 92%);
-      border-radius: 1.25rem;
-      display: flex;
-      margin: .25rem .5rem .25rem 0;
-      max-height: 1.3rem;
-      padding: .25rem .5rem .25rem .5rem;
-      transition: background-color .3s;
-      white-space: nowrap;
-    }
-    .token:hover {
-      background-color: hsl(214, 15%, 88%);
-    }
-    .readonly .token {
-      color: hsl(0, 0%, 40%);
-    }
-    .token-remove, .remove-all {
-      align-items: center;
-      background-color: hsl(214, 15%, 55%);
-      border-radius: 50%;
-      color: hsl(214, 17%, 92%);
-      display: flex;
-      justify-content: center;
-      height: 1.25rem;
-      margin-left: .25rem;
-      min-width: 1.25rem;
-    }
-    .token-remove:hover, .remove-all:hover {
-      background-color: hsl(215, 21%, 43%);
-      cursor: pointer;
-    }
-  
-    .actions {
-      align-items: center;
-      display: flex;
-      flex: 1;
-      min-width: 15rem;
-    }
-  
-    input {
-      border: none;
-      font-size: 1.5rem;
-      line-height: 1.5rem;
-          margin: 0;
-      outline: none;
-          padding: 0;
-      width: 100%;
-    }
-  
-    .dropdown-arrow path {
-      fill: hsl(0, 0%, 70%);
-    }
-    .multiselect:hover .dropdown-arrow path {
-      fill: hsl(0, 0%, 50%);
-    }
-  
-    .icon-clear path {
-      fill: white;
-    }
-  
-    .options {
-      box-shadow: 0px 2px 4px rgba(0,0,0,.1), 0px -2px 4px rgba(0,0,0,.1);
-      left: 0;
-      list-style: none;
-      margin-block-end: 0;
-      margin-block-start: 0;
-      max-height: 70vh;
-      overflow: auto;
-      padding-inline-start: 0;
-      position: absolute;
-      top: calc(100% + 1px);
-      width: 100%;
-    }
-    li {
-      background-color: white;
-      cursor: pointer;
-      padding: .5rem;
-    }
-    li:last-child {
-      border-bottom-left-radius: .2rem;
-      border-bottom-right-radius: .2rem;
-    }
-    li:not(.selected):hover {
-      background-color: hsl(214, 17%, 92%);
-    }
-    li.selected {
-      background-color: hsl(232, 54%, 41%);
-      color: white;
-    }
-    li.selected:nth-child(even) {
-      background-color: hsl(232, 50%, 45%);
-      color: white;
-    }
-    li.active {
-      background-color: hsl(214, 17%, 88%);
-    }
-    li.selected.active, li.selected:hover {
-      background-color: hsl(232, 48%, 50%);
-    }
-  
-    .hidden {
-      display: none;
-    }
-  </style>
-  
-  <div class="multiselect" class:readonly>
-    <div class="tokens" class:showOptions on:click={handleTokenClick}>
-      {#each Object.values(selected) as s}
-        <div class="token" data-id="{s.value}">
-          <span>{s.name}</span>
-          {#if !readonly}
-            <div class="token-remove" title="Remove {s.name}">
-              <svg class="icon-clear" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
-                <path d="{iconClearPath}"/>
-              </svg>
-            </div>
-          {/if}
-        </div>
-      {/each}
-      <div class="actions">
-        {#if !readonly}
-          <input id={id} autocomplete="off" bind:value={inputValue} bind:this={input} on:keyup={handleKeyup} on:blur={handleBlur} placeholder={placeholder}/>
-          <div class="remove-all" title="Remove All" class:hidden={!Object.keys(selected).length}>
-            <svg class="icon-clear" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
-              <path d="{iconClearPath}"/>
-            </svg>
-          </div>
-          <svg class="dropdown-arrow" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18"><path d="M5 8l4 4 4-4z"></path></svg>
-        {/if}
-      </div>
-    </div>
-  
-    <select bind:this={slot} type="multiple" class="hidden"><slot></slot></select>
-    
-    {#if showOptions}
-      <ul class="options" transition:fly="{{duration: 200, y: 5}}" on:mousedown|preventDefault={handleOptionMousedown}>
-        {#each filtered as option}
-          <li class:selected={selected[option.value]} class:active={activeOption === option} data-value="{option.value}">{option.name}</li>
-        {/each}
-      </ul>
-    {/if}
-  </div>
+	import MultiSelect from './sorting.svelte';
+	import {download} from '@tadashi/fd'
+	import DateRangeSelect from 'svelte-date-range-select';
+	import { writable, derived } from 'svelte/store';
+	export let apiData = writable([]);
+	export const apiData1 = writable([]);
+	export const Data = derived(apiData, ($apiData) => {
+		// console.log($apiData);
+		if ($apiData.results) {
+			return $apiData.results;
+		}
+		return [];
+	});
+	let date = '',
+		strain = '',
+		lineage = '',
+		mutation = '',
+		reference_id = '',
+		gene = '',
+		amine_acid_position = '',
+		search = '',
+		page = 1,
+		prev = '',
+		start_date = '',
+		end_date = '',
+		days = 36500,
+		next = '',
+		ordering = '';
+	const name = 'createdDate';
+	const heading = 'Created Date';
+	// this limits the HTML5 date picker end date - e.g. today is used here
+	let endDateMax = new Date();
+	// this limits the HTML5 date picker's start date - e.g. 3 years is select here
+	let startDateMin = new Date(
+		new Date().setFullYear(endDateMax.getFullYear(), endDateMax.getMonth() - 36)
+	);
+
+	// console.log(handleApplyDateRange.endDateMax)
+	// option to override the defaults - change to other language, below are the default values
+	const labels = {
+		notSet: 'not set',
+		greaterThan: 'greater than',
+		lessThan: 'less than',
+		range: 'range',
+		day: 'day',
+		days: 'days',
+		apply: 'ok'
+	};
+
+	// form post ids
+	const startDateId = 'start_date_id';
+	const endDateId = 'end_date_id';
+
+	// executed when the user selects the range by clicking the apply button (with the fa-check icon)
+	function handleApplyDateRange(data) {
+		console.log(data.detail.startDate);
+		start_date = data.detail.startDate;
+		end_date = data.detail.endDate;
+		console.log(start_date, end_date);
+		submit(page);
+		// e.g. will return an object
+		// {
+		//  startDate: 2000-12-01,
+		//  endDate: 2020-04-06,
+		//  name: createdDate
+		// }
+	}
+
+	
+	async function submit(page) {
+		if (page > 1) {
+			prev = page-1
+		}
+		const res = await fetch(
+			`http://10.10.6.87/api/data1/?ordering=${ordering}&days=${days}&start_date=${start_date}&end_date=${end_date}&date=${date}&page=${page}&lineage=${lineage}&gene=${gene}&mutation=${mutation}&reference_id=${reference_id}&strain=${strain}&amine_acid_position=${amine_acid_position}&search=${search}`,
+			{
+				headers: { 'content-type': 'application/json' }
+			}
+		)
+			.then((res) => res.json())
+			.then((results) => {
+				console.log(results);
+				apiData.set(results);
+			})
+			.catch((error) => {
+				console.log(error);
+				// return [];
+			});
+	}
+
+	export const Data1 = derived(apiData1, ($apiData1) => {
+	//   console.log($apiData1)
+	  if ($apiData1.path){
+	    // return $apiData.data1.map(strain => strain.strain);
+	    return $apiData.path;
+	  }
+	  return [];
+	  });
+
+	onMount(async () => {
+		const response = await fetch(`http://10.10.6.87/api/data1/?days=${days}`, {
+			headers: { 'Content-Type': 'application/json' },
+			credentials: 'include'
+		})
+			.then((response) => response.json())
+			.then((data) => {
+				console.log(data);
+				apiData.set(data);
+			})
+			.catch((error) => {
+				console.log(error);
+				// return [];
+			});
+	});
+	import { onMount } from 'svelte';
+
+	let file;
+
+	function upload() {
+		const dataArray = new FormData();
+		dataArray.append('file', file[0]);
+		const submit = fetch(`http://10.10.6.87/api/adddata/?days=${days}`, {
+			method: 'POST',
+			body: dataArray
+		})
+			.then((response) => response.json())
+			.then((result) => {
+				console.log('Success:', result);
+			})
+			.catch((error) => {
+				console.error('Error:', error);
+			});
+	}
+
+
+	async function get_download_link() {
+		const res = await fetch(
+			`http://10.10.6.87/api/exportcsv/?ordering=${ordering}&days=${days}&start_date=${start_date}&end_date=${end_date}&date=${date}&page=${page}&lineage=${lineage}&gene=${gene}&mutation=${mutation}&reference_id=${reference_id}&strain=${strain}&amine_acid_position=${amine_acid_position}&search=${search}`,
+			{
+				headers: { 'content-type': 'application/json' }
+			}
+		)
+			.then((res) => res.json())
+			.then((data) => {
+				let file_name = data.path.split('/').at(-1)
+				let download_path = `http://10.10.6.87/download/${file_name}`
+				// console.log(download_path)
+				getFile(download_path, file_name)
+			})
+			.catch((error) => {
+				console.log(error);
+				// return [];
+			});
+	}
+	async function getFile(url, filename) {
+		const response = await fetch(url)
+		await download(response, filename)
+	}
+
+</script>
+
+<head>
+	<meta charset="UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css" />
+	<title>User Data</title>
+</head>
+<div class="cloumns">
+	<div class="column">
+		<div class="box" style="background-color: lightblue;">
+			<form>
+				<div class="columns is-centered mb-0">
+					<div class="column">
+						<!-- svelte-ignore a11y-label-has-associated-control -->
+						<label class="lable">Upload MAf file:</label>
+						<input type="file" bind:files={file} name="file" required="required" />
+						<button class="button is-link" type="submit" on:click|preventDefault={upload}
+							>Upload</button
+						>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<div class="cloumns">
+	<div class="column">
+		<div class="box" style="background-color: lightblue;">
+			<div class="columns is-centered mb-0">
+				<div class="column-4" hidden>
+					<!-- svelte-ignore a11y-label-has-associated-control -->
+					<label class="lable">Page:</label>
+					<div>
+						<input bind:value={page} type="text" name="strain" />
+					</div>
+				</div>
+				<div class="column-2">
+					<!-- svelte-ignore a11y-label-has-associated-control -->
+					<!-- <label class="lable">STRAIN:</label> -->
+					<div>
+						<input bind:value={strain} type="text" name="strain" placeholder="Strain" />
+					</div>
+				</div>
+				<div class="column-2">
+					<!-- svelte-ignore a11y-label-has-associated-control -->
+					<!-- <label class="lable">LINEAGE:</label> -->
+					<div>
+						<input bind:value={lineage} type="text" name="lineage" placeholder="Lineage" />
+					</div>
+				</div>
+				<div class="column-2">
+					<!-- svelte-ignore a11y-label-has-associated-control -->
+					<!-- <label class="lable">GENE:</label> -->
+					<div>
+						<input bind:value={gene} type="text" name="gene" placeholder="Gene" />
+					</div>
+				</div>
+				<div class="column-2">
+					<!-- svelte-ignore a11y-label-has-associated-control -->
+					<!-- <label class="lable">REFERENCE:</label> -->
+					<div>
+						<input
+							bind:value={reference_id}
+							type="text"
+							name="reference_id"
+							placeholder="Reference"
+						/>
+					</div>
+				</div>
+				<div class="column-2">
+					<!-- svelte-ignore a11y-label-has-associated-control -->
+					<!-- <label class="lable">AA POSITION:</label> -->
+					<div>
+						<input
+							bind:value={amine_acid_position}
+							type="text"
+							name="amine_acid_position"
+							placeholder="AA Position"
+						/>
+					</div>
+				</div>
+				<div class="column-2">
+					<!-- svelte-ignore a11y-label-has-associated-control -->
+					<!-- <label class="lable">MUTATION:</label> -->
+					<div>
+						<input bind:value={mutation} type="text" name="mutation" placeholder="Mutation" />
+					</div>
+				</div>
+			</div>
+			<br />
+			<div class="columns is-centered mb-0">
+				<div class="column-2">
+					<!-- svelte-ignore a11y-label-has-associated-control -->
+					<!-- <label class="lable">DATE:</label> -->
+					<div>
+						<input bind:value={date} type="text" placeholder="yyyy-mm-dd" />
+						<!-- <input name=x size=10 maxlength=10  onkeyup="this.value=this.value.replace(/^(\d\d)(\d)$/g,'$1/$2').replace(/^(\d\d\/\d\d)(\d+)$/g,'$1/$2').replace(/[^\d\/]/g,'')"> -->
+					</div>
+				</div>
+				<div class="column-2">
+					<!-- svelte-ignore a11y-label-has-associated-control -->
+					<!-- <label class="lable">SEARCH BY KEY WORD:</label> -->
+					<div>
+						<input bind:value={search} type="text" name="search" placeholder="Search by key word" />
+					</div>
+				</div>
+				<div class="column-2">
+					<!-- svelte-ignore a11y-label-has-associated-control -->
+					<!-- <label class="lable">From Date:</label> -->
+					<div>
+						<input
+							bind:value={start_date}
+							type="text"
+							placeholder="yyyy-mm-dd(from)"
+							name="start_date"
+						/>
+						<!-- <input name=x size=10 maxlength=10  onkeyup="this.value=this.value.replace(/^(\d\d)(\d)$/g,'$1/$2').replace(/^(\d\d\/\d\d)(\d+)$/g,'$1/$2').replace(/[^\d\/]/g,'')"> -->
+					</div>
+				</div>
+				<div class="column-2">
+					<!-- svelte-ignore a11y-label-has-associated-control -->
+					<!-- <label class="lable">To Date:</label> -->
+					<div>
+						<input bind:value={end_date} type="text" placeholder="yyyy-mm-dd(to)" name="end_date" />
+						<!-- <input name=x size=10 maxlength=10  onkeyup="this.value=this.value.replace(/^(\d\d)(\d)$/g,'$1/$2').replace(/^(\d\d\/\d\d)(\d+)$/g,'$1/$2').replace(/[^\d\/]/g,'')"> -->
+					</div>
+				</div>
+				<div class="column-2">
+					<!-- svelte-ignore a11y-label-has-associated-control -->
+
+					<div>
+						<label class="lable">Recent Data:</label>
+						<select id="days" bind:value={days} name="days">
+							<option value="36500">All data</option>
+							<option value="7">Last week</option>
+							<option value="14">Last 2week</option>
+							<option value="21">Last 3week</option>
+							<option value="30">Last month</option>
+							<option value="60">Last 2month</option>
+							<option value="90">Last 3month</option>
+							<option value="120">Last 4month</option>
+							<option value="150">Last 5month</option>
+							<option value="182">Last 6months</option>
+							<option value="365">This year</option>
+							<!-- <option value="custom">Custom</option> -->
+						</select>
+						<!-- <input bind:value={days} type="text" class="hide" placeholder="Custom Selector" name="custom" id="customInput"> -->
+					</div>
+				</div>
+				<div class="column-6">
+					<!-- svelte-ignore a11y-label-has-associated-control -->
+					<!-- <label class="lable">...</label> -->
+					<div>
+						<input type="button" on:click={submit(page)} value="Get Data" />
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="columns is-centered is-offset-4 mt-0 pt-0">
+		<div class="column-2">
+			<!-- <div class="column-2"> -->
+			<!-- svelte-ignore a11y-label-has-associated-control -->
+			<!-- <label class="lable">To Date:</label> -->
+			<div>
+				<DateRangeSelect
+					{startDateMin}
+					{endDateMax}
+					{name}
+					{heading}
+					{labels}
+					{startDateId}
+					{endDateId}
+					on:onApplyDateRange={handleApplyDateRange}
+				/>
+			</div>
+			<!-- </div> -->
+		</div>
+	</div>
+</div>
+<div class="box">
+	<div class="container has-text-right">
+		Export data to csv: <button on:click={get_download_link}>Export</button>
+	</div>
+	<div class="column">
+		<!-- <section class="hero"> -->
+		<!-- <div class="hero-body"> -->
+		<p class="has-text-success">TOTAL RECORDS = {$apiData.count}</p>
+		<div class="table-container sortable">
+			<table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+				<thead id="head" class="has-text-centered is-sortable">
+					<tr>
+						<th rowspan="2" on:click={submit}>ID</th>
+						<th rowspan="2">DATE</th>
+						<th rowspan="2" on:click={submit(page)} value={(ordering = '-string')}>STRAIN</th>
+						<th rowspan="2">LINEAGE</th>
+						<th rowspan="2">GENE</th>
+						<th rowspan="2">REFERENCE</th>
+						<th rowspan="2">AA POSITION</th>
+						<th rowspan="2">MUTATION</th>
+					</tr>
+				</thead>
+				<tbody class="has-text-centered">
+					<!-- {#if submit} -->
+					{#each $Data as data}
+						<tr>
+							<th scope="row">{data.id}</th>
+							<td>{data.date}</td>
+							<td>{data.strain}</td>
+							<td>{data.lineage}</td>
+							<td>{data.gene}</td>
+							<td>{data.reference_id}</td>
+							<td>{data.amine_acid_position}</td>
+							<td>{data.mutation}</td>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+<!-- {#if page>1}
+<div class="container has-text-centered">{page} out of {($apiData.count / 100 + 1) ^ 0 } pages</div>
+{/if} -->
+{#if page > 1}
+	<div class="container has-text-centered">
+		{prev + 1} out of {($apiData.count / 100 + 1) ^ 0} pages
+	</div>
+{:else}
+	<div class="container has-text-centered">
+		{page} out of {($apiData.count / 100 + 1) ^ 0} pages
+	</div>
+{/if}
+<nav class="pagination is-centered" role="navigation" aria-label="pagination">
+	<ul class="pagination-list">
+		{#if page > 1}
+			<li
+				class="pagination-link"
+				aria-label="Goto page"
+				data-color="black"
+				on:click={submit((page = prev))}
+			>
+				Prev page
+			</li>
+			<li
+				class="pagination-link"
+				aria-label="Goto page"
+				data-color="black"
+				on:click={submit((page = 1))}
+			>
+				1
+			</li>
+			<li>....</li>
+		{/if}
+		{#if page > 1}
+			<li
+				class="pagination-link"
+				aria-label="Goto page"
+				data-color="black"
+				on:click={submit((page = prev + 1))}
+			>
+				{prev + 1}
+			</li>
+		{:else}
+			<li
+				class="pagination-link"
+				aria-label="Goto page"
+				data-color="black"
+				on:click={submit((page = 1))}
+			>
+				1
+			</li>
+		{/if}
+		{#if page >= 1 && page < (($apiData.count / 100 + 1) ^ 0)}
+			<li
+				class="pagination-link"
+				aria-label="Goto page"
+				data-color="black"
+				on:click={submit((page = page + 1))}
+			>
+				Next page
+			</li>
+		{/if}
+	</ul>
+</nav>
+<style>
+	select:invalid {
+		color: gray;
+	}
+	option {
+		color: black;
+	}
+</style>
