@@ -4,7 +4,7 @@
 	import { download } from '@tadashi/fd'
 	import { writable, derived } from 'svelte/store';
 	export let apiData = writable([]);
-	export const apiData1 = writable([]);
+	// export const apiData1 = writable([]);
 	export const Data = derived(apiData, ($apiData) => {
 		// console.log($apiData);
 		if ($apiData.results) {
@@ -66,7 +66,7 @@
 		//  name: createdDate
 		// }
 	}
-	async function submit(page) {
+	async function submit(page,ordering) {
 		if (page > 1) {
 			prev = page - 1;
 		}
@@ -86,14 +86,35 @@
 				// return [];
 			});
 	}
-	export const Data1 = derived(apiData1, ($apiData1) => {
-		// console.log($apiData1);
-		if ($apiData1.path) {
-			// return $apiData.data1.map(strain => strain.strain);
-			return $apiData1.path;
-		}
-		return [];
-	});
+
+	// export const order = writable([]);
+	// export const ordereddata = derived(order, ($order) => {
+	// 	// console.log($apiData);
+	// 	if ($order.results) {
+	// 		return $order.results;
+	// 	}
+	// 	return [];
+	// });
+	async function orderdata(ordering) {
+		const res = await fetch(
+			`http://10.10.6.87/api/data/?page_size=${page_size}&state=${state}&mutation_deletion=${mutation_deletion}&ordering=${ordering}&days=${days}&start_date=${start_date}&end_date=${end_date}&date=${date}&page=${page}&lineage=${lineage}&gene=${gene}&mutation=${mutation}&reference_id=${reference_id}&strain=${strain}&amino_acid_position=${amino_acid_position}&search=${search}`,
+			{
+				headers: { 'content-type': 'application/json' }
+			}
+		)
+			.then((res) => res.json())
+			.then((results) => {
+				console.log(results);
+				apiData.set(results);
+			})
+			.catch((error) => {
+				console.log(error);
+				// return [];
+			});
+	}
+
+
+
 	onMount(async () => {
 		const response = await fetch(`http://10.10.6.87/api/data/?days=${days}`, {
 			headers: { 'Content-Type': 'application/json' },
@@ -109,7 +130,7 @@
 				// return [];
 			});
 	});
-
+	
 
 
 	import { onMount, tick } from 'svelte';
@@ -245,6 +266,8 @@
 	// 		table.rows.add(rows).draw()
 	// 	})
 	// })
+	let iconAsc = "↑";
+	let iconDesc = "↓";
 </script>
 <head>
 	<meta charset="UTF-8" />
@@ -259,19 +282,15 @@
 </svelte:head>
 
 <Hidden bind:this={child} />
-<!-- <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
 	<div class="navbar-brand">
-	  <a class="navbar-item has-text-centered" href="https://bulma.io">
-		<img src="https://bulma.io/images/bulma-logo.png" alt="Bulma: Free, open source, and modern CSS framework based on Flexbox" width="112" height="28">
-	  </a>
-  
-	  <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
-		<span aria-hidden="true"></span>
-		<span aria-hidden="true"></span>
-		<span aria-hidden="true"></span>
-	  </a>
+	  <!-- svelte-ignore a11y-missing-attribute -->
+	  <!-- <div class="logo-image has-text-centered"> -->
+		<img src="./INSACOG_Logo2.png" class="img-fluid">
+  	<!-- </div> -->
 	</div>
-  </nav><br><br> -->
+  </nav><br><br>
+  <!-- <img src="/home/nsm-07/Downloads/INSACOG_Logo1.png" alt="Bulma: Free, open source, and modern CSS framework based on Flexbox" width="112" height="28"> -->
 <div class="cloumns">
 	<div class="column">
 		<div class="box" style="background-color: lightblue;">
@@ -403,6 +422,7 @@
 			</div>
 			<br />
 			<div class="columns is-centered mb-0">
+				<!-- svelte-ignore a11y-missing-attribute -->
 				<a class="is-clickable is-link" on:click={() => (child.shown = !child.shown)} style="color:blue"
 					>{child && child.shown ? 'Hide advance filter' : ' Show advance filter'}</a
 				>
@@ -562,101 +582,122 @@
 				{/each}
 			</div>
 		</div>
-		<div class="box">
+		<!-- <div class="box"> -->
 		<div class="columns has-text-right">
-			<div class="mr-3">
-				<div class="select mr-2">
-					<select class="is-clickable" bind:value={page_size} name="days">
-						<option value={page_size} name="days">100 Records</option>
-						<option value="50">50 Records</option>
-						<option value="14">150 Records</option>
-						<option value="21">200 Records</option>
-					</select>
-				</div>
-			<!-- <input
-				class="is-dark mr-2"
-				bind:value={page_size}
-				type="text"
-				placeholder="page_size"
-			/> -->
-			<button class="button is-link mr-2" type="submit" on:click={submit(page)}
+			<div class="column">
+			<div class="columns is-centered mb-0">
+					<div class="column-2">
+						<div class="select mr-2">
+							<select class="is-clickable" bind:value={page_size} name="days">
+								<option value={page_size} name="days">100 Records</option>
+								<option value="50">50 Records</option>
+								<option value="14">150 Records</option>
+								<option value="21">200 Records</option>
+							</select>
+						</div>
+					</div>
+					<div class="column-2">
+						<button class="button is-dark mr-2" type="submit" on:click={submit(page)}
 								>Get</button
 							>
-			</div>
-			<div class="pagination_section mr-5">
-				<nav class="pagination is-centered" role="navigation" aria-label="pagination">
-					<ul class="pagination-list is-clickable">
-						{#if page > 1}
-							<li
-								class="pagination-link"
-								aria-label="Goto page"
-								data-color="black"
-								on:click={submit((page = prev))}
-							>
-								Prev page
-							</li>
-							<li
-								class="pagination-link"
-								aria-label="Goto page"
-								data-color="black"
-								on:click={submit((page = 1))}
-							>
-								1
-							</li>
-							<li>....</li>
-						{/if}
-						{#if page > 1}
-							<li
-								class="pagination-link"
-								aria-label="Goto page"
-								data-color="black"
-								on:click={submit((page = prev + 1))}
-							>
-								{prev + 1}
-							</li>
-						{:else}
-							<li
-								class="pagination-link"
-								aria-label="Goto page"
-								data-color="black"
-								on:click={submit((page = 1))}
-							>
-								1
-							</li>
-						{/if}
-						{#if page >= 1 && page < (($apiData.count / 100 + 1) ^ 0)}
-							<li
-								class="pagination-link"
-								aria-label="Goto page"
-								data-color="black"
-								on:click={submit((page = page + 1))}
-							>
-								Next page
-							</li>
-						{/if}
-					</ul>
-				</nav>
-			</div>
-			<div class="container has-text-right pt-4">
-				Download data to csv: <button class="is-clickable" on:click={get_download_link}
-					>Download <i class="fa fa-download is-link is-clickable" style="color:blue" /></button
-				>
+					</div>
+					<div class="column-2">
+						<div class="pagination_section mr-5">
+							<nav class="pagination is-centered" role="navigation" aria-label="pagination">
+								<ul class="pagination-list is-clickable">
+									{#if page > 1}
+										<li
+											class="pagination-link"
+											aria-label="Goto page"
+											data-color="black"
+											on:click={submit((page = prev))}
+										>
+											Prev page
+										</li>
+										<li
+											class="pagination-link"
+											aria-label="Goto page"
+											data-color="black"
+											on:click={submit((page = 1))}
+										>
+											1
+										</li>
+										<li>....</li>
+									{/if}
+									{#if page > 1}
+										<li
+											class="pagination-link"
+											aria-label="Goto page"
+											data-color="black"
+											on:click={submit((page = prev + 1))}
+										>
+											{prev + 1}
+										</li>
+									{:else}
+										<li
+											class="pagination-link"
+											aria-label="Goto page"
+											data-color="black"
+											on:click={submit((page = 1))}
+										>
+											1
+										</li>
+									{/if}
+									{#if page >= 1 && page < (($apiData.count / 100 + 1) ^ 0)}
+										<li
+											class="pagination-link"
+											aria-label="Goto page"
+											data-color="black"
+											on:click={submit((page = page + 1))}
+										>
+											Next page
+										</li>
+									{/if}
+								</ul>
+							</nav>
+						</div>
+					</div>
 			</div>
 		</div>
+		</div>
+	<!-- </div> -->
+
+	<div class="has-text-right">
+		Download data to csv: <button class="is-clickable" on:click={get_download_link}
+			>Download <i class="fa fa-download is-link is-clickable" style="color:blue" /></button
+		>
 	</div>
 		<div class="box table-container sortable">
 			<table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
 				<thead id="head" class="has-text-centered is-sortable">
 					<tr class="th">
+						<!-- <th><b>#</b> <i class="fa fa-fw fa-sort"></i></th> -->
 						<!-- <th rowspan="2">ID</th> -->
-						<th rowspan="2">DATE</th>
-						<th rowspan="2">STRAIN</th>
-						<th rowspan="2">STATE</th>
-						<th rowspan="2">LINEAGE</th>
-						<th rowspan="2">GENE</th>
-						<th rowspan="2">REFERENCE</th>
-						<th rowspan="2">AA POSITION</th>
-						<th rowspan="2">MUTATION</th>
+						<!-- svelte-ignore a11y-missing-attribute -->
+						<!-- svelte-ignore a11y-missing-content -->
+						<th rowspan="2">DATE <a on:click={submit(page,ordering="date")}>{iconAsc}</a><a on:click={submit(page,ordering="-date")}>{iconDesc}</a></th>
+						<!-- svelte-ignore a11y-missing-attribute -->
+						<!-- svelte-ignore a11y-missing-content -->
+						<!-- class='fa fa-fw fa-arrow-down' -->
+						<th rowspan="2">STRAIN <a on:click={submit(page,ordering="strain")}>{iconAsc}</a><a on:click={submit(page,ordering="-strain")}>{iconDesc}</a></th>
+						<!-- svelte-ignore a11y-missing-attribute -->
+						<!-- svelte-ignore a11y-missing-content -->
+						<th rowspan="2">STATE <a on:click={submit(page,ordering="state")}>{iconAsc}</a><a on:click={submit(page,ordering="-state")}>{iconDesc}</a></th>
+						<!-- svelte-ignore a11y-missing-attribute -->
+						<!-- svelte-ignore a11y-missing-content -->
+						<th rowspan="2">LINEAGE <a on:click={submit(page,ordering="lineage")}>{iconAsc}</a><a on:click={submit(page,ordering="-lineage")}>{iconDesc}</a></th>
+						<!-- svelte-ignore a11y-missing-attribute -->
+						<!-- svelte-ignore a11y-missing-content -->
+						<th rowspan="2">GENE <a on:click={submit(page,ordering="gene")}>{iconAsc}</a><a on:click={submit(page,ordering="-gene")}>{iconDesc}</a></th>
+						<!-- svelte-ignore a11y-missing-attribute -->
+						<!-- svelte-ignore a11y-missing-content -->
+						<th rowspan="2">REFERENCE <a on:click={submit(page,ordering="reference_id")}>{iconAsc}</a><a on:click={submit(page,ordering="-reference_id")}>{iconDesc}</a></th>
+						<!-- svelte-ignore a11y-missing-attribute -->
+						<!-- svelte-ignore a11y-missing-content -->
+						<th rowspan="2">AA POSITION <a on:click={submit(page,ordering="amino_acid_position")}>{iconAsc}</a><a on:click={submit(page,ordering="-amino_acid_position")}>{iconDesc}</a></th>
+						<!-- svelte-ignore a11y-missing-attribute -->
+						<!-- svelte-ignore a11y-missing-content -->
+						<th rowspan="2">MUTATION <a on:click={submit(page,ordering="mutation")}>{iconAsc}</a><a on:click={submit(page,ordering="-mutation")}>{iconDesc}</a></th>
 					</tr>
 				</thead>
 				<tbody class="has-text-centered">
@@ -788,6 +829,10 @@
 		/* position: absolute; */
 		/* z-index: 10; */
 	/* } */
-
-
+	.img-fluid {
+		display: block;
+		/* margin-left: auto;
+		margin-right: auto; */
+		width: 50%;
+	}
 </style>
