@@ -28,7 +28,8 @@
 		next = '',
 		state = '',
 		mutation_deletion = '',
-		ordering = '';
+		ordering = '',
+		page_size = 100;
 	const name = 'createdDate';
 	const heading = 'Created Date';
 	// this limits the HTML5 date picker end date - e.g. today is used here
@@ -70,7 +71,7 @@
 			prev = page - 1;
 		}
 		const res = await fetch(
-			`http://10.10.6.87/api/data/?state=${state}&mutation_deletion=${mutation_deletion}&ordering=${ordering}&days=${days}&start_date=${start_date}&end_date=${end_date}&date=${date}&page=${page}&lineage=${lineage}&gene=${gene}&mutation=${mutation}&reference_id=${reference_id}&strain=${strain}&amino_acid_position=${amino_acid_position}&search=${search}`,
+			`http://10.10.6.87/api/data/?page_size=${page_size}&state=${state}&mutation_deletion=${mutation_deletion}&ordering=${ordering}&days=${days}&start_date=${start_date}&end_date=${end_date}&date=${date}&page=${page}&lineage=${lineage}&gene=${gene}&mutation=${mutation}&reference_id=${reference_id}&strain=${strain}&amino_acid_position=${amino_acid_position}&search=${search}`,
 			{
 				headers: { 'content-type': 'application/json' }
 			}
@@ -108,7 +109,10 @@
 				// return [];
 			});
 	});
-	import { onMount } from 'svelte';
+
+
+
+	import { onMount, tick } from 'svelte';
 	let file;
 	let file_version;
 	function upload() {
@@ -230,18 +234,44 @@
 		const response = await fetch(url)
 		await download(response, filename)
 	}
-
+	// import jQuery from 'jquery'
+	// let el // table element
+	// let table // table object (API)
+	
+	// onMount(() => {
+	// 	table = jQuery(el).DataTable()
+		
+	// 	$Data.then(rows => {
+	// 		table.rows.add(rows).draw()
+	// 	})
+	// })
 </script>
 <head>
 	<meta charset="UTF-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css" />
-	<title>User Data</title>
+	<title>Insacog meta data</title>
 </head>
 
-<Hidden bind:this={child} />
+<svelte:head>
+	<link rel="stylesheet" href="//cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css" />
+</svelte:head>
 
+<Hidden bind:this={child} />
+<!-- <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+	<div class="navbar-brand">
+	  <a class="navbar-item has-text-centered" href="https://bulma.io">
+		<img src="https://bulma.io/images/bulma-logo.png" alt="Bulma: Free, open source, and modern CSS framework based on Flexbox" width="112" height="28">
+	  </a>
+  
+	  <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+		<span aria-hidden="true"></span>
+		<span aria-hidden="true"></span>
+		<span aria-hidden="true"></span>
+	  </a>
+	</div>
+  </nav><br><br> -->
 <div class="cloumns">
 	<div class="column">
 		<div class="box" style="background-color: lightblue;">
@@ -262,7 +292,7 @@
 								<div class="field">
 									<!-- svelte-ignore a11y-label-has-associated-control -->
 									<label class="label">Upload File</label>
-									<div class="control">
+									<div class="control mr-5">
 										<input class="input is-clickable" type="file" bind:files={file} name="file" required="required" />
 									</div>
 								</div>
@@ -270,7 +300,7 @@
 							<div class="level-item">
 								<div class="field">
 									<div class="control">
-										<button class="button is-link" type="submit" on:click|preventDefault={upload}
+										<button class="button is-link mt-5" type="submit" on:click|preventDefault={upload}
 											>Upload</button
 										>
 									</div>
@@ -443,9 +473,9 @@
 				<hr class="dashed">
 				<!-- <div class="is-divider" data-content="OR"></div> -->
 				<div class="columns is-centered is-offset-4 mt-0 pt-0">
-					<div class="column-2">
+					<div class="column-2 is-4">
 						<div>
-							<DateRangeSelect
+							<DateRangeSelect class="is-6"
 								{startDateMin}
 								{endDateMax}
 								{name}
@@ -468,7 +498,7 @@
 	rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
 />
-<div>
+<div class="box">
 	<div>
 		<div class="cloumns">
 			<div class="column">
@@ -528,21 +558,93 @@
 								</div>
 							</div>
 						</article>
-						<!-- <article class="notification is-success mr-2 has-text-centered"> -->
-							<div class="column-2 mt-5 pt-3" style="height: 20px;">
-								<div class="container has-text-right">
-									Download data to csv: <button class="is-clickable" on:click={get_download_link}
-										>Download <i class="fa fa-download is-link is-clickable" style="color:blue" /></button
-									>
-								</div>
-							</div>
-						<!-- </article> -->
 					</div>
 				{/each}
 			</div>
 		</div>
-
-		<div class="table-container sortable">
+		<div class="box">
+		<div class="columns has-text-right">
+			<div class="mr-3">
+				<div class="select mr-2">
+					<select class="is-clickable" bind:value={page_size} name="days">
+						<option value={page_size} name="days">100 Records</option>
+						<option value="50">50 Records</option>
+						<option value="14">150 Records</option>
+						<option value="21">200 Records</option>
+					</select>
+				</div>
+			<!-- <input
+				class="is-dark mr-2"
+				bind:value={page_size}
+				type="text"
+				placeholder="page_size"
+			/> -->
+			<button class="button is-link mr-2" type="submit" on:click={submit(page)}
+								>Get</button
+							>
+			</div>
+			<div class="pagination_section mr-5">
+				<nav class="pagination is-centered" role="navigation" aria-label="pagination">
+					<ul class="pagination-list is-clickable">
+						{#if page > 1}
+							<li
+								class="pagination-link"
+								aria-label="Goto page"
+								data-color="black"
+								on:click={submit((page = prev))}
+							>
+								Prev page
+							</li>
+							<li
+								class="pagination-link"
+								aria-label="Goto page"
+								data-color="black"
+								on:click={submit((page = 1))}
+							>
+								1
+							</li>
+							<li>....</li>
+						{/if}
+						{#if page > 1}
+							<li
+								class="pagination-link"
+								aria-label="Goto page"
+								data-color="black"
+								on:click={submit((page = prev + 1))}
+							>
+								{prev + 1}
+							</li>
+						{:else}
+							<li
+								class="pagination-link"
+								aria-label="Goto page"
+								data-color="black"
+								on:click={submit((page = 1))}
+							>
+								1
+							</li>
+						{/if}
+						{#if page >= 1 && page < (($apiData.count / 100 + 1) ^ 0)}
+							<li
+								class="pagination-link"
+								aria-label="Goto page"
+								data-color="black"
+								on:click={submit((page = page + 1))}
+							>
+								Next page
+							</li>
+						{/if}
+					</ul>
+				</nav>
+			</div>
+			<div class="container has-text-right pt-4">
+				Download data to csv: <button class="is-clickable" on:click={get_download_link}
+					>Download <i class="fa fa-download is-link is-clickable" style="color:blue" /></button
+				>
+			</div>
+		</div>
+	</div>
+		<div class="box table-container sortable">
 			<table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
 				<thead id="head" class="has-text-centered is-sortable">
 					<tr class="th">
@@ -578,11 +680,11 @@
 </div>
 {#if page > 1}
 	<div class="container has-text-centered">
-		{prev + 1} out of {($apiData.count / 100 + 1) ^ 0} pages
+		{prev + 1} out of {($apiData.count / page_size + 1) ^ 0} pages
 	</div>
 {:else}
 	<div class="container has-text-centered">
-		{page} out of {($apiData.count / 100 + 1) ^ 0} pages
+		{page} out of {($apiData.count / page_size + 1) ^ 0} pages
 	</div>
 {/if}
 <nav class="pagination is-centered" role="navigation" aria-label="pagination">
@@ -670,16 +772,22 @@
 	
 	}
 	table {
-		border-collapse: collapse;
+		border: 10px;
+		/* border-collapse: collapse; */
 		/* border-radius: 30px; */
-		border-style: hidden; /* hide standard table (collapsed) border */
+		 /* hide standard table (collapsed) border */
 		box-shadow: 0 0 0 1px rgb(129, 17, 17); /* this draws the table border  */
 	}
 	td {
-		border: 1px solid rgb(5, 5, 5);
+		border: 1px solid rgb(204, 41, 41);
+	}
+	tr {
+		border: 0 0 0 1px rgb(7, 4, 4);
 	}
 	/* div p .title{ */
 		/* position: absolute; */
 		/* z-index: 10; */
 	/* } */
+
+
 </style>
