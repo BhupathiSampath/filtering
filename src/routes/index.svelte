@@ -1,5 +1,5 @@
 <script>
-	import MultiSelect from './sorting.svelte';
+	// import MultiSelect from './upload.svelte';
 	import DateRangeSelect from 'svelte-date-range-select';
 	import { download } from '@tadashi/fd'
 	import { writable, derived } from 'svelte/store';
@@ -70,32 +70,6 @@
 		if (page > 1) {
 			prev = page - 1;
 		}
-		const res = await fetch(
-			`http://10.10.6.87/api/data/?page_size=${page_size}&state=${state}&mutation_deletion=${mutation_deletion}&ordering=${ordering}&days=${days}&start_date=${start_date}&end_date=${end_date}&date=${date}&page=${page}&lineage=${lineage}&gene=${gene}&mutation=${mutation}&reference_id=${reference_id}&strain=${strain}&amino_acid_position=${amino_acid_position}&search=${search}`,
-			{
-				headers: { 'content-type': 'application/json' }
-			}
-		)
-			.then((res) => res.json())
-			.then((results) => {
-				console.log(results);
-				apiData.set(results);
-			})
-			.catch((error) => {
-				console.log(error);
-				// return [];
-			});
-	}
-
-	// export const order = writable([]);
-	// export const ordereddata = derived(order, ($order) => {
-	// 	// console.log($apiData);
-	// 	if ($order.results) {
-	// 		return $order.results;
-	// 	}
-	// 	return [];
-	// });
-	async function orderdata(ordering) {
 		const res = await fetch(
 			`http://10.10.6.87/api/data/?page_size=${page_size}&state=${state}&mutation_deletion=${mutation_deletion}&ordering=${ordering}&days=${days}&start_date=${start_date}&end_date=${end_date}&date=${date}&page=${page}&lineage=${lineage}&gene=${gene}&mutation=${mutation}&reference_id=${reference_id}&strain=${strain}&amino_acid_position=${amino_acid_position}&search=${search}`,
 			{
@@ -269,73 +243,12 @@
 	let iconAsc = "↑";
 	let iconDesc = "↓";
 </script>
-<head>
-	<meta charset="UTF-8" />
-	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css" />
-	<title>Insacog meta data</title>
-</head>
-
-<svelte:head>
-	<link rel="stylesheet" href="//cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css" />
-</svelte:head>
 
 <Hidden bind:this={child} />
-<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
-	<div class="navbar-brand">
-	  <!-- svelte-ignore a11y-missing-attribute -->
-	  <!-- <div class="logo-image has-text-centered"> -->
-		<img src="./INSACOG_Logo2.png" class="img-fluid">
-  	<!-- </div> -->
-	</div>
-  </nav><br><br>
-  <!-- <img src="/home/nsm-07/Downloads/INSACOG_Logo1.png" alt="Bulma: Free, open source, and modern CSS framework based on Flexbox" width="112" height="28"> -->
-<div class="cloumns">
-	<div class="column">
-		<div class="box" style="background-color: lightblue;">
-			<div class="columns is-centered mb-0">
-				<form>
-					<div class="level">
-						<div class="level-left">
-							<div class="level-item">
-								<div class="field">
-									<!-- svelte-ignore a11y-label-has-associated-control -->
-									<label class="label">Version File</label>
-									<div class="control">
-										<input class="input is-clickable" type="file" bind:files={file_version} name="file_version" required="required" />
-									</div>
-								</div>
-							</div>
-							<div class="level-item">
-								<div class="field">
-									<!-- svelte-ignore a11y-label-has-associated-control -->
-									<label class="label">Upload File</label>
-									<div class="control mr-5">
-										<input class="input is-clickable" type="file" bind:files={file} name="file" required="required" />
-									</div>
-								</div>
-							</div>
-							<div class="level-item">
-								<div class="field">
-									<div class="control">
-										<button class="button is-link mt-5" type="submit" on:click|preventDefault={upload}
-											>Upload</button
-										>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</form>
-			</div>
-		</div>
-	</div>
-</div>
 
 <div class="cloumns">
 	<div class="column">
-		<div class="box" style="background-color: lightblue;">
+		<div class="box">
 			<div class="columns is-centered mb-0">
 				<div class="column-4" hidden>
 					<!-- svelte-ignore a11y-label-has-associated-control -->
@@ -434,17 +347,6 @@
 						<div>
 							<input
 								class="input is-dark mr-2"
-								bind:value={mutation}
-								type="text"
-								name="mutation"
-								placeholder="Mutation"
-							/>
-						</div>
-					</div>
-					<div class="column-2">
-						<div>
-							<input
-								class="input is-dark mr-2"
 								bind:value={gene}
 								type="text"
 								name="gene"
@@ -471,6 +373,17 @@
 								type="text"
 								name="amino_acid_position"
 								placeholder="AA Position"
+							/>
+						</div>
+					</div>
+					<div class="column-2">
+						<div>
+							<input
+								class="input is-dark mr-2"
+								bind:value={mutation}
+								type="text"
+								name="mutation"
+								placeholder="Mutation"
 							/>
 						</div>
 					</div>
@@ -591,8 +504,8 @@
 							<select class="is-clickable" bind:value={page_size} name="days">
 								<option value={page_size} name="days">100 Records</option>
 								<option value="50">50 Records</option>
-								<option value="14">150 Records</option>
-								<option value="21">200 Records</option>
+								<option value="150">150 Records</option>
+								<option value="200">200 Records</option>
 							</select>
 						</div>
 					</div>
@@ -657,16 +570,21 @@
 							</nav>
 						</div>
 					</div>
+					<div class="column-2">
+						<button class="button is-dark ml-5" type="submit" on:click={get_download_link}
+								><i class="fa fa-download is-link is-clickable mr-2 mt-1"/>Download Data</button
+							>
+					</div>
 			</div>
 		</div>
 		</div>
 	<!-- </div> -->
 
-	<div class="has-text-right">
+	<!-- <div class="has-text-right">
 		Download data to csv: <button class="is-clickable" on:click={get_download_link}
 			>Download <i class="fa fa-download is-link is-clickable" style="color:blue" /></button
 		>
-	</div>
+	</div> -->
 		<div class="box table-container sortable">
 			<table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
 				<thead id="head" class="has-text-centered is-sortable">
@@ -675,32 +593,32 @@
 						<!-- <th rowspan="2">ID</th> -->
 						<!-- svelte-ignore a11y-missing-attribute -->
 						<!-- svelte-ignore a11y-missing-content -->
-						<th rowspan="2">DATE <a on:click={submit(page,ordering="date")}>{iconAsc}</a><a on:click={submit(page,ordering="-date")}>{iconDesc}</a></th>
+						<th rowspan="2">DATE <a class='fa fa-fw fa-arrow-up' on:click={submit(page,ordering="date")}></a><a class='fa fa-fw fa-arrow-down' on:click={submit(page,ordering="-date")}></a></th>
 						<!-- svelte-ignore a11y-missing-attribute -->
 						<!-- svelte-ignore a11y-missing-content -->
 						<!-- class='fa fa-fw fa-arrow-down' -->
-						<th rowspan="2">STRAIN <a on:click={submit(page,ordering="strain")}>{iconAsc}</a><a on:click={submit(page,ordering="-strain")}>{iconDesc}</a></th>
+						<th rowspan="2">STRAIN <a class='fa fa-fw fa-arrow-up' on:click={submit(page,ordering="strain")}></a><a class='fa fa-fw fa-arrow-down' on:click={submit(page,ordering="-strain")}></a></th>
 						<!-- svelte-ignore a11y-missing-attribute -->
 						<!-- svelte-ignore a11y-missing-content -->
-						<th rowspan="2">STATE <a on:click={submit(page,ordering="state")}>{iconAsc}</a><a on:click={submit(page,ordering="-state")}>{iconDesc}</a></th>
+						<th rowspan="2">STATE <a class='fa fa-fw fa-arrow-up' on:click={submit(page,ordering="state")}></a><a class='fa fa-fw fa-arrow-down' on:click={submit(page,ordering="-state")}></a></th>
 						<!-- svelte-ignore a11y-missing-attribute -->
 						<!-- svelte-ignore a11y-missing-content -->
-						<th rowspan="2">LINEAGE <a on:click={submit(page,ordering="lineage")}>{iconAsc}</a><a on:click={submit(page,ordering="-lineage")}>{iconDesc}</a></th>
+						<th rowspan="2">LINEAGE <a class='fa fa-fw fa-arrow-up' on:click={submit(page,ordering="lineage")}></a><a class='fa fa-fw fa-arrow-down' on:click={submit(page,ordering="-lineage")}></a></th>
 						<!-- svelte-ignore a11y-missing-attribute -->
 						<!-- svelte-ignore a11y-missing-content -->
-						<th rowspan="2">GENE <a on:click={submit(page,ordering="gene")}>{iconAsc}</a><a on:click={submit(page,ordering="-gene")}>{iconDesc}</a></th>
+						<th rowspan="2">GENE <a class='fa fa-fw fa-arrow-up' on:click={submit(page,ordering="gene")}></a><a class='fa fa-fw fa-arrow-down' on:click={submit(page,ordering="-gene")}></a></th>
 						<!-- svelte-ignore a11y-missing-attribute -->
 						<!-- svelte-ignore a11y-missing-content -->
-						<th rowspan="2">REFERENCE <a on:click={submit(page,ordering="reference_id")}>{iconAsc}</a><a on:click={submit(page,ordering="-reference_id")}>{iconDesc}</a></th>
+						<th rowspan="2">REFERENCE <a class='fa fa-fw fa-arrow-up' on:click={submit(page,ordering="reference_id")}></a><a class='fa fa-fw fa-arrow-down' on:click={submit(page,ordering="-reference_id")}></a></th>
 						<!-- svelte-ignore a11y-missing-attribute -->
 						<!-- svelte-ignore a11y-missing-content -->
-						<th rowspan="2">AA POSITION <a on:click={submit(page,ordering="amino_acid_position")}>{iconAsc}</a><a on:click={submit(page,ordering="-amino_acid_position")}>{iconDesc}</a></th>
+						<th rowspan="2">AA POSITION <a class='fa fa-fw fa-arrow-up' on:click={submit(page,ordering="amino_acid_position")}></a><a class='fa fa-fw fa-arrow-down' on:click={submit(page,ordering="-amino_acid_position")}></a></th>
 						<!-- svelte-ignore a11y-missing-attribute -->
 						<!-- svelte-ignore a11y-missing-content -->
-						<th rowspan="2">MUTATION <a on:click={submit(page,ordering="mutation")}>{iconAsc}</a><a on:click={submit(page,ordering="-mutation")}>{iconDesc}</a></th>
+						<th rowspan="2">MUTATION <a class='fa fa-fw fa-arrow-up' on:click={submit(page,ordering="mutation")}></a><a class='fa fa-fw fa-arrow-down' on:click={submit(page,ordering="-mutation")}></a></th>
 					</tr>
 				</thead>
-				<tbody class="has-text-centered">
+				<tbody class="has-text-centered is-info" id="body">
 					{#each $Data as data}
 						<tr>
 							<!-- <th scope="row">{data.id}</th> -->
@@ -796,6 +714,7 @@
 	.title {
 		color: rgb(27, 181, 233);
 		font-size: 15px;
+		font-family: 'Times New Roman', Times, serif;
 	}
 	.lable {
 		font-size: 15px;
@@ -818,6 +737,8 @@
 		/* border-radius: 30px; */
 		 /* hide standard table (collapsed) border */
 		box-shadow: 0 0 0 1px rgb(129, 17, 17); /* this draws the table border  */
+		width: 80px;
+		/* background-color: lightblue; */
 	}
 	td {
 		border: 1px solid rgb(204, 41, 41);
@@ -829,10 +750,7 @@
 		/* position: absolute; */
 		/* z-index: 10; */
 	/* } */
-	.img-fluid {
-		display: block;
-		/* margin-left: auto;
-		margin-right: auto; */
-		width: 50%;
-	}
+	/* #body {
+		background-color: lightblue;
+	} */
 </style>
