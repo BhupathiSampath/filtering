@@ -199,6 +199,34 @@
 				// return [];
 			});
 	});
+
+	export const pversions = writable([]);
+	// $pversions.split(":")
+	export const pangoapiversions = derived(pversions, ($pversions) => {
+		// console.log($apiData1);
+		if ($pversions) {
+			// return $apiData.data1.map(strain => strain.strain);
+			return $pversions;
+		}
+		return [];
+	});
+	// $pangoapiversions.split(":")
+	onMount(async () => {
+		const response = await fetch(`https://research.nibmg.ac.in/insacog/api/files/landing-stats/`, {
+			headers: { 'Content-Type': 'application/json' },
+			method: 'POST',
+			credentials: 'include'
+		})
+			.then((response) => response.json())
+			.then((results) => {
+				console.log(results);
+				pversions.set(results);
+			})
+			.catch((error) => {
+				console.log(error);
+				// return [];
+			});
+	});
 	import Hidden from './advancefilter.svelte';
 	let child;
 
@@ -245,7 +273,6 @@
 </script>
 
 <Hidden bind:this={child} />
-
 <div class="cloumns">
 	<div class="column">
 		<div class="box">
@@ -431,6 +458,7 @@
 	rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
 />
+<button class="vs-button no-pointer-event m-0 is-inline-block mt-1 vs-button--null vs-button--size-small vs-button--active vs-button--transparent" data-v-163d42e1 data-v-870626b8 style="--vs-color:255,143,65;">{$pangoapiversions.nextclade_version}</button>
 <div class="box">
 	<div>
 		<div class="cloumns">
@@ -440,54 +468,81 @@
 						<article class="notification is-success mr-2 pt-2 has-text-centered">
 							<div class="column-2">
 								<!-- svelte-ignore a11y-label-has-associated-control -->
-								<label class="lable">Date</label>
+								<!-- <label class="lable">Date</label> -->
 								<div>
-									<p class="title">{version.date}</p>
+									<p class="title">Date: {version.date}</p>
 								</div>
 							</div>
 						</article>
 						<article class="notification is-success mr-2 pt-2 has-text-centered">
 							<div class="column-2">
 								<!-- svelte-ignore a11y-label-has-associated-control -->
-								<label class="lable">Total Records</label>
+								<!-- <label class="lable">Total Records</label> -->
 								<div>
-									<p class="title">{$apiData.count}</p>
+									<p class="title">Total Records: {$apiData.count}</p>
 								</div>
 							</div>
 						</article>
 						<article class="notification is-success mr-2 pt-2 has-text-centered">
 							<div class="column-2">
 								<!-- svelte-ignore a11y-label-has-associated-control -->
-								<label class="lable">Total Sequences</label>
+								<!-- <label class="lable">Total Sequences</label> -->
 								<div>
-									<p class="title">{$count.count}</p>
+									<p class="title">Total Sequences: {$count.count}</p>
 								</div>
 							</div>
 						</article>
 						<article class="notification is-success mr-2 pt-2 has-text-centered">
 							<div class="column-2">
 								<!-- svelte-ignore a11y-label-has-associated-control -->
-								<label class="lable">Pango Version</label>
+								<!-- <label class="lable">Pango Version</label> -->
 								<div>
-									<p class="title">{version.version}</p>
+									<p class="title">{$pangoapiversions.nextclade_version}</p>
 								</div>
 							</div>
 						</article>
 						<article class="notification is-success mr-2 pt-2 has-text-centered">
 							<div class="column-2">
 								<!-- svelte-ignore a11y-label-has-associated-control -->
-								<label class="lable">Pangolin Version</label>
+								<!-- <label class="lable">Pangolin Version</label> -->
 								<div>
-									<p class="title">{version.pangolin_version}</p>
+									<p class="title">{$pangoapiversions.pango_designation_version}</p>
 								</div>
 							</div>
 						</article>
 						<article class="notification is-success mr-2 pt-2 has-text-centered">
 							<div class="column-2">
 								<!-- svelte-ignore a11y-label-has-associated-control -->
-								<label class="lable mb-2">PangoLEARN Version</label>
+								<!-- <label class="lable mb-2">PangoLEARN Version</label> -->
 								<div>
-									<p class="title">{version.pangoLEARN_version}</p>
+									<p class="title">{$pangoapiversions.pangolearn_version}</p>
+								</div>
+							</div>
+						</article>
+						<article class="notification is-success mr-2 pt-2 has-text-centered">
+							<div class="column-2">
+								<!-- svelte-ignore a11y-label-has-associated-control -->
+								<!-- <label class="lable mb-2">PangoLEARN Version</label> -->
+								<div>
+									<p class="title">{$pangoapiversions.constellation_version}</p>
+								</div>
+							</div>
+						</article>
+						<article class="notification is-success mr-2 pt-2 has-text-centered">
+							<div class="column-2">
+								<!-- svelte-ignore a11y-label-has-associated-control -->
+								<!-- <label class="lable mb-2">PangoLEARN Version</label> -->
+								<div>
+									<p class="title">{$pangoapiversions.pangolin_version}</p>
+								</div>
+							</div>
+						</article>
+						<article class="notification is-success mr-2 pt-2 has-text-centered">
+							<div class="column-2">
+								<!-- svelte-ignore a11y-label-has-associated-control -->
+								<!-- <label class="lable mb-2">PangoLEARN Version</label> -->
+								<div>
+									<p class="title">{$pangoapiversions.pangolin_version}</p>
 								</div>
 							</div>
 						</article>
