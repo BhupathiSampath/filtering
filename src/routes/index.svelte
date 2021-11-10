@@ -1,7 +1,8 @@
 <script>
 	// import MultiSelect from './upload.svelte';
+	import jQuery from 'jquery';
 	import DateRangeSelect from 'svelte-date-range-select';
-	import { download } from '@tadashi/fd'
+	import { download } from '@tadashi/fd';
 	import { writable, derived } from 'svelte/store';
 	export let apiData = writable([]);
 	// export const apiData1 = writable([]);
@@ -66,7 +67,7 @@
 		//  name: createdDate
 		// }
 	}
-	async function submit(page,ordering) {
+	async function submit(page, ordering) {
 		if (page > 1) {
 			prev = page - 1;
 		}
@@ -87,8 +88,6 @@
 			});
 	}
 
-
-
 	onMount(async () => {
 		const response = await fetch(`http://10.10.6.87/api/data/?days=${days}`, {
 			headers: { 'Content-Type': 'application/json' },
@@ -104,8 +103,6 @@
 				// return [];
 			});
 	});
-	
-
 
 	import { onMount, tick } from 'svelte';
 	let file;
@@ -230,7 +227,6 @@
 	import Hidden from './advancefilter.svelte';
 	let child;
 
-
 	async function get_download_link() {
 		const res = await fetch(
 			`http://10.10.6.87/api/exportcsv/?ordering=${ordering}&mutation_deletion=${mutation_deletion}&days=${days}&start_date=${start_date}&end_date=${end_date}&date=${date}&page=${page}&lineage=${lineage}&gene=${gene}&mutation=${mutation}&reference_id=${reference_id}&strain=${strain}&amino_acid_position=${amino_acid_position}&search=${search}`,
@@ -242,11 +238,11 @@
 			.then((data) => {
 				// console.log(data.path)
 				// let file_name = data.path.split('/').at(-1)
-				let file_name = data.path
-				console.log(file_name)
-				let download_path = `http://10.10.6.87/download/${file_name}`
-				console.log(download_path)
-				getFile(download_path, file_name)
+				let file_name = data.path;
+				console.log(file_name);
+				let download_path = `http://10.10.6.87/download/${file_name}`;
+				console.log(download_path);
+				getFile(download_path, file_name);
 			})
 			.catch((error) => {
 				console.log(error);
@@ -254,28 +250,37 @@
 			});
 	}
 	async function getFile(url, filename) {
-		const response = await fetch(url)
-		await download(response, filename)
+		const response = await fetch(url);
+		await download(response, filename);
 	}
-	// import jQuery from 'jquery'
-	// let el // table element
-	// let table // table object (API)
-	
-	// onMount(() => {
-	// 	table = jQuery(el).DataTable()
-		
-	// 	$Data.then(rows => {
-	// 		table.rows.add(rows).draw()
-	// 	})
-	// })
-	let iconAsc = "↑";
-	let iconDesc = "↓";
+
+	onMount(() => {
+		jQuery('#btn').click(function () {
+			jQuery('#bx').toggle();
+		});
+	});
+
+	onMount(() => {
+		jQuery('input').hover(function () {
+			jQuery('#strain').toggle();
+			jQuery('#state').toggle();
+			jQuery('#mutation_deletion').toggle();
+			jQuery('#lineage').toggle();
+		});
+	});
+	let iconAsc = '↑';
+	let iconDesc = '↓';
 </script>
 
 <Hidden bind:this={child} />
-<div class="cloumns">
+<!-- <button id="btn" hidden>button</button> -->
+
+<div class="columns">
+	<!-- <div class="help has-text-centerd" id="btn">
+	<p>Multiple lineages can be searched</p>
+	</div> -->
 	<div class="column">
-		<div class="box">
+		<div class="box" id="bx">
 			<div class="columns is-centered mb-0">
 				<div class="column-4" hidden>
 					<!-- svelte-ignore a11y-label-has-associated-control -->
@@ -285,52 +290,123 @@
 					</div>
 				</div>
 				<div class="column-2">
-					<!-- svelte-ignore a11y-label-has-associated-control -->
-					<!-- <label class="lable">STRAIN:</label> -->
-					<div>
-						<input
-							class="input is-dark mr-2"
-							bind:value={strain}
-							type="text"
-							name="strain"
-							placeholder="Strain"
-						/>
+					<div class="dropdown is-hoverable">
+						<div class="dropdown-trigger">
+							<!-- <button class="button" aria-haspopup="true" aria-controls="dropdown-menu4"> -->
+							<input
+								class="input is-dark mr-2"
+								bind:value={strain}
+								type="text"
+								placeholder="Strain"
+							/>
+							<!-- <span class="icon is-small">
+							  <i class="fas fa-angle-down" aria-hidden="true"></i>
+							</span> -->
+							<!-- </button> -->
+						</div>
+						<div class="dropdown-menu" id="dropdown-menu4" role="menu">
+							<div class="dropdown-content">
+								<div class="dropdown-item">
+									<p>Enter key value</p>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 				<div class="column-2">
-					<div>
-						<input class="input is-dark mr-2" bind:value={state} type="text" placeholder="state" />
+					<div class="dropdown is-hoverable">
+						<div class="dropdown-trigger">
+							<!-- <button class="button" aria-haspopup="true" aria-controls="dropdown-menu4"> -->
+							<input
+								class="input is-dark mr-2"
+								bind:value={state}
+								type="text"
+								placeholder="State"
+							/>
+							<!-- <span class="icon is-small">
+							  <i class="fas fa-angle-down" aria-hidden="true"></i>
+							</span> -->
+							<!-- </button> -->
+						</div>
+						<div class="dropdown-menu" id="dropdown-menu4" role="menu">
+							<div class="dropdown-content">
+								<div class="dropdown-item">
+									<p>Enter key value</p>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 				<div class="column-2">
-					<div>
-						<input
-							class="input is-dark mr-2"
-							bind:value={lineage}
-							type="text"
-							name="lineage"
-							placeholder="Lineage"
-						/>
+					<div class="dropdown is-hoverable">
+						<div class="dropdown-trigger">
+							<!-- <button class="button" aria-haspopup="true" aria-controls="dropdown-menu4"> -->
+							<input
+								class="input is-dark mr-2"
+								bind:value={lineage}
+								type="text"
+								placeholder="Lineage"
+							/>
+							<!-- <span class="icon is-small">
+							  <i class="fas fa-angle-down" aria-hidden="true"></i>
+							</span> -->
+							<!-- </button> -->
+						</div>
+						<div class="dropdown-menu" id="dropdown-menu4" role="menu">
+							<div class="dropdown-content">
+								<div class="dropdown-item">
+									<p>Enter exact match & It can be multiple</p>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 				<div class="column-2">
-					<div>
-						<input
-							class="input is-dark mr-2"
-							bind:value={mutation_deletion}
-							type="text"
-							placeholder="mutation_deletion"
-						/>
+					<div class="dropdown is-hoverable">
+						<div class="dropdown-trigger">
+							<!-- <button class="button" aria-haspopup="true" aria-controls="dropdown-menu4"> -->
+							<input
+								class="input is-dark mr-2"
+								bind:value={mutation_deletion}
+								type="text"
+								placeholder="Mutaion & Deletion"
+							/>
+							<!-- <span class="icon is-small">
+							  <i class="fas fa-angle-down" aria-hidden="true"></i>
+							</span> -->
+							<!-- </button> -->
+						</div>
+						<div class="dropdown-menu" id="dropdown-menu4" role="menu">
+							<div class="dropdown-content">
+								<div class="dropdown-item">
+									<p>Enter key value or Combination of gene,mutation,reference,Amino position</p>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 				<div class="column-2">
-					<div>
-						<input
-							class="input is-dark mr-2"
-							bind:value={date}
-							type="text"
-							placeholder="yyyy-mm-dd"
-						/>
+					<div class="dropdown is-hoverable">
+						<div class="dropdown-trigger">
+							<!-- <button class="button" aria-haspopup="true" aria-controls="dropdown-menu4"> -->
+							<input
+								class="input is-dark mr-2"
+								bind:value={date}
+								type="text"
+								placeholder="YYYY_MM_DD"
+							/>
+							<!-- <span class="icon is-small">
+							  <i class="fas fa-angle-down" aria-hidden="true"></i>
+							</span> -->
+							<!-- </button> -->
+						</div>
+						<div class="dropdown-menu" id="dropdown-menu4" role="menu">
+							<div class="dropdown-content">
+								<div class="dropdown-item">
+									<p>Enter key value</p>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 				<div class="column-2">
@@ -363,55 +439,110 @@
 			<br />
 			<div class="columns is-centered mb-0">
 				<!-- svelte-ignore a11y-missing-attribute -->
-				<a class="is-clickable is-link" on:click={() => (child.shown = !child.shown)} style="color:blue"
-					>{child && child.shown ? 'Hide advance filter' : ' Show advance filter'}</a
+				<button
+					class="is-clickable is-link"
+					on:click={() => (child.shown = !child.shown)}
+					style="background-color: lightblue;border-radius: 30px;"
+					>{child && child.shown ? 'Hide advance filter' : ' Show advance filter'}</button
 				>
 			</div>
 			{#if child && child.shown}
-			<br />
+				<br />
 				<div class="columns is-centered mb-0">
 					<div class="column-2">
-						<div>
-							<input
-								class="input is-dark mr-2"
-								bind:value={gene}
-								type="text"
-								name="gene"
-								placeholder="Gene"
-							/>
+						<div class="dropdown is-hoverable">
+							<div class="dropdown-trigger">
+								<!-- <button class="button" aria-haspopup="true" aria-controls="dropdown-menu4"> -->
+								<input
+									class="input is-dark mr-2"
+									bind:value={gene}
+									type="text"
+									placeholder="Gene"
+								/>
+								<!-- <span class="icon is-small">
+								  <i class="fas fa-angle-down" aria-hidden="true"></i>
+								</span> -->
+								<!-- </button> -->
+							</div>
+							<div class="dropdown-menu" id="dropdown-menu4" role="menu">
+								<div class="dropdown-content">
+									<div class="dropdown-item">
+										<p>Enter key value</p>
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
 					<div class="column-2">
-						<div>
+						<div class="dropdown is-hoverable">
+						<div class="dropdown-trigger">
+							<!-- <button class="button" aria-haspopup="true" aria-controls="dropdown-menu4"> -->
 							<input
 								class="input is-dark mr-2"
 								bind:value={reference_id}
 								type="text"
-								name="reference_id"
-								placeholder="Reference"
+								placeholder="Reference Rd"
 							/>
+							<!-- <span class="icon is-small">
+							  <i class="fas fa-angle-down" aria-hidden="true"></i>
+							</span> -->
+							<!-- </button> -->
+						</div>
+						<div class="dropdown-menu" id="dropdown-menu4" role="menu">
+							<div class="dropdown-content">
+								<div class="dropdown-item">
+									<p>Enter key value</p>
+								</div>
+							</div>
+						</div>
+					</div>
+					</div>
+					<div class="column-2">
+						<div class="dropdown is-hoverable">
+							<div class="dropdown-trigger">
+								<!-- <button class="button" aria-haspopup="true" aria-controls="dropdown-menu4"> -->
+								<input
+									class="input is-dark mr-2"
+									bind:value={amino_acid_position}
+									type="text"
+									placeholder="Amino position"
+								/>
+								<!-- <span class="icon is-small">
+								  <i class="fas fa-angle-down" aria-hidden="true"></i>
+								</span> -->
+								<!-- </button> -->
+							</div>
+							<div class="dropdown-menu" id="dropdown-menu4" role="menu">
+								<div class="dropdown-content">
+									<div class="dropdown-item">
+										<p>Enter key value</p>
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
 					<div class="column-2">
-						<div>
-							<input
-								class="input is-dark mr-2"
-								bind:value={amino_acid_position}
-								type="text"
-								name="amino_acid_position"
-								placeholder="AA Position"
-							/>
-						</div>
-					</div>
-					<div class="column-2">
-						<div>
-							<input
-								class="input is-dark mr-2"
-								bind:value={mutation}
-								type="text"
-								name="mutation"
-								placeholder="Mutation"
-							/>
+						<div class="dropdown is-hoverable">
+							<div class="dropdown-trigger">
+								<!-- <button class="button" aria-haspopup="true" aria-controls="dropdown-menu4"> -->
+								<input
+									class="input is-dark mr-2"
+									bind:value={mutation}
+									type="text"
+									placeholder="Mutation"
+								/>
+								<!-- <span class="icon is-small">
+								  <i class="fas fa-angle-down" aria-hidden="true"></i>
+								</span> -->
+								<!-- </button> -->
+							</div>
+							<div class="dropdown-menu" id="dropdown-menu4" role="menu">
+								<div class="dropdown-content">
+									<div class="dropdown-item">
+										<p>Enter key value</p>
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
 					<div class="column-6">
@@ -430,12 +561,13 @@
 					</div>
 				</div> -->
 				</div>
-				<hr class="dashed">
+				<hr class="dashed" />
 				<!-- <div class="is-divider" data-content="OR"></div> -->
 				<div class="columns is-centered is-offset-4 mt-0 pt-0">
 					<div class="column-2 is-4">
 						<div>
-							<DateRangeSelect class="is-6"
+							<DateRangeSelect
+								class="is-6"
 								{startDateMin}
 								{endDateMax}
 								{name}
@@ -458,7 +590,7 @@
 	rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
 />
-<button class="vs-button no-pointer-event m-0 is-inline-block mt-1 vs-button--null vs-button--size-small vs-button--active vs-button--transparent" data-v-163d42e1 data-v-870626b8 style="--vs-color:255,143,65;">{$pangoapiversions.nextclade_version}</button>
+<!-- <button class="vs-button no-pointer-event m-0 is-inline-block mt-1 vs-button--null vs-button--size-small vs-button--active vs-button--transparent" data-v-163d42e1 data-v-870626b8 style="--vs-color:255,143,65;">{$pangoapiversions.nextclade_version}</button> -->
 <div class="box">
 	<div>
 		<div class="cloumns">
@@ -553,7 +685,7 @@
 		<!-- <div class="box"> -->
 		<div class="columns has-text-right">
 			<div class="column">
-			<div class="columns is-centered mb-0">
+				<div class="columns is-centered mb-0">
 					<div class="column-2">
 						<div class="select mr-2">
 							<select class="is-clickable" bind:value={page_size} name="days">
@@ -565,9 +697,7 @@
 						</div>
 					</div>
 					<div class="column-2">
-						<button class="button is-dark mr-2" type="submit" on:click={submit(page)}
-								>Get</button
-							>
+						<button class="button is-dark mr-2" type="submit" on:click={submit(page)}>Get</button>
 					</div>
 					<div class="column-2">
 						<div class="pagination_section mr-5">
@@ -627,15 +757,15 @@
 					</div>
 					<div class="column-2">
 						<button class="button is-dark ml-5" type="submit" on:click={get_download_link}
-								><i class="fa fa-download is-link is-clickable mr-2 mt-1"/>Download Data</button
-							>
+							><i class="fa fa-download is-link is-clickable mr-2 mt-1" />Download Data</button
+						>
 					</div>
+				</div>
 			</div>
 		</div>
-		</div>
-	<!-- </div> -->
+		<!-- </div> -->
 
-	<!-- <div class="has-text-right">
+		<!-- <div class="has-text-right">
 		Download data to csv: <button class="is-clickable" on:click={get_download_link}
 			>Download <i class="fa fa-download is-link is-clickable" style="color:blue" /></button
 		>
@@ -648,29 +778,93 @@
 						<!-- <th rowspan="2">ID</th> -->
 						<!-- svelte-ignore a11y-missing-attribute -->
 						<!-- svelte-ignore a11y-missing-content -->
-						<th rowspan="2">DATE <a class='fa fa-fw fa-arrow-up' on:click={submit(page,ordering="date")}></a><a class='fa fa-fw fa-arrow-down' on:click={submit(page,ordering="-date")}></a></th>
+						<th rowspan="2"
+							>DATE <a
+								class="fa fa-fw fa-arrow-up"
+								on:click={submit(page, (ordering = 'date'))}
+							/><a
+								class="fa fa-fw fa-arrow-down"
+								on:click={submit(page, (ordering = '-date'))}
+							/></th
+						>
 						<!-- svelte-ignore a11y-missing-attribute -->
 						<!-- svelte-ignore a11y-missing-content -->
 						<!-- class='fa fa-fw fa-arrow-down' -->
-						<th rowspan="2">STRAIN <a class='fa fa-fw fa-arrow-up' on:click={submit(page,ordering="strain")}></a><a class='fa fa-fw fa-arrow-down' on:click={submit(page,ordering="-strain")}></a></th>
+						<th rowspan="2"
+							>STRAIN <a
+								class="fa fa-fw fa-arrow-up"
+								on:click={submit(page, (ordering = 'strain'))}
+							/><a
+								class="fa fa-fw fa-arrow-down"
+								on:click={submit(page, (ordering = '-strain'))}
+							/></th
+						>
 						<!-- svelte-ignore a11y-missing-attribute -->
 						<!-- svelte-ignore a11y-missing-content -->
-						<th rowspan="2">STATE <a class='fa fa-fw fa-arrow-up' on:click={submit(page,ordering="state")}></a><a class='fa fa-fw fa-arrow-down' on:click={submit(page,ordering="-state")}></a></th>
+						<th rowspan="2"
+							>STATE <a
+								class="fa fa-fw fa-arrow-up"
+								on:click={submit(page, (ordering = 'state'))}
+							/><a
+								class="fa fa-fw fa-arrow-down"
+								on:click={submit(page, (ordering = '-state'))}
+							/></th
+						>
 						<!-- svelte-ignore a11y-missing-attribute -->
 						<!-- svelte-ignore a11y-missing-content -->
-						<th rowspan="2">LINEAGE <a class='fa fa-fw fa-arrow-up' on:click={submit(page,ordering="lineage")}></a><a class='fa fa-fw fa-arrow-down' on:click={submit(page,ordering="-lineage")}></a></th>
+						<th rowspan="2"
+							>LINEAGE <a
+								class="fa fa-fw fa-arrow-up"
+								on:click={submit(page, (ordering = 'lineage'))}
+							/><a
+								class="fa fa-fw fa-arrow-down"
+								on:click={submit(page, (ordering = '-lineage'))}
+							/></th
+						>
 						<!-- svelte-ignore a11y-missing-attribute -->
 						<!-- svelte-ignore a11y-missing-content -->
-						<th rowspan="2">GENE <a class='fa fa-fw fa-arrow-up' on:click={submit(page,ordering="gene")}></a><a class='fa fa-fw fa-arrow-down' on:click={submit(page,ordering="-gene")}></a></th>
+						<th rowspan="2"
+							>GENE <a
+								class="fa fa-fw fa-arrow-up"
+								on:click={submit(page, (ordering = 'gene'))}
+							/><a
+								class="fa fa-fw fa-arrow-down"
+								on:click={submit(page, (ordering = '-gene'))}
+							/></th
+						>
 						<!-- svelte-ignore a11y-missing-attribute -->
 						<!-- svelte-ignore a11y-missing-content -->
-						<th rowspan="2">REFERENCE <a class='fa fa-fw fa-arrow-up' on:click={submit(page,ordering="reference_id")}></a><a class='fa fa-fw fa-arrow-down' on:click={submit(page,ordering="-reference_id")}></a></th>
+						<th rowspan="2"
+							>REFERENCE <a
+								class="fa fa-fw fa-arrow-up"
+								on:click={submit(page, (ordering = 'reference_id'))}
+							/><a
+								class="fa fa-fw fa-arrow-down"
+								on:click={submit(page, (ordering = '-reference_id'))}
+							/></th
+						>
 						<!-- svelte-ignore a11y-missing-attribute -->
 						<!-- svelte-ignore a11y-missing-content -->
-						<th rowspan="2">AA POSITION <a class='fa fa-fw fa-arrow-up' on:click={submit(page,ordering="amino_acid_position")}></a><a class='fa fa-fw fa-arrow-down' on:click={submit(page,ordering="-amino_acid_position")}></a></th>
+						<th rowspan="2"
+							>AA POSITION <a
+								class="fa fa-fw fa-arrow-up"
+								on:click={submit(page, (ordering = 'amino_acid_position'))}
+							/><a
+								class="fa fa-fw fa-arrow-down"
+								on:click={submit(page, (ordering = '-amino_acid_position'))}
+							/></th
+						>
 						<!-- svelte-ignore a11y-missing-attribute -->
 						<!-- svelte-ignore a11y-missing-content -->
-						<th rowspan="2">MUTATION <a class='fa fa-fw fa-arrow-up' on:click={submit(page,ordering="mutation")}></a><a class='fa fa-fw fa-arrow-down' on:click={submit(page,ordering="-mutation")}></a></th>
+						<th rowspan="2"
+							>MUTATION <a
+								class="fa fa-fw fa-arrow-up"
+								on:click={submit(page, (ordering = 'mutation'))}
+							/><a
+								class="fa fa-fw fa-arrow-down"
+								on:click={submit(page, (ordering = '-mutation'))}
+							/></th
+						>
 					</tr>
 				</thead>
 				<tbody class="has-text-centered is-info" id="body">
@@ -784,13 +978,12 @@
 		height: 70px;
 		/* padding: 5px 10px; */
 		/* flex: block; */
-	
 	}
 	table {
 		border: 10px;
 		/* border-collapse: collapse; */
 		/* border-radius: 30px; */
-		 /* hide standard table (collapsed) border */
+		/* hide standard table (collapsed) border */
 		box-shadow: 0 0 0 1px rgb(129, 17, 17); /* this draws the table border  */
 		width: 80px;
 		/* background-color: lightblue; */
@@ -802,10 +995,14 @@
 		border: 0 0 0 1px rgb(7, 4, 4);
 	}
 	/* div p .title{ */
-		/* position: absolute; */
-		/* z-index: 10; */
+	/* position: absolute; */
+	/* z-index: 10; */
 	/* } */
 	/* #body {
 		background-color: lightblue;
 	} */
+	#img {
+		width: 50%;
+		height: 20px;
+	}
 </style>
