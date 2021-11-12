@@ -683,7 +683,7 @@
 			</div>
 		</div>
 		<!-- <div class="box"> -->
-		<div class="columns has-text-right">
+		<div class="columns">
 			<div class="column">
 				<div class="columns is-centered mb-0">
 					<div class="column-2">
@@ -975,7 +975,7 @@
 	.notification {
 		border-radius: 10px;
 		/* width: 200px; */
-		height: 70px;
+		height: 80px;
 		/* padding: 5px 10px; */
 		/* flex: block; */
 	}
@@ -1001,8 +1001,4 @@
 	/* #body {
 		background-color: lightblue;
 	} */
-	#img {
-		width: 50%;
-		height: 20px;
-	}
 </style>
