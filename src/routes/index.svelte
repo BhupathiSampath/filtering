@@ -886,7 +886,6 @@
 				<tbody class="has-text-centered is-info" id="body">
 					{#each $Data as data}
 						<tr>
-							<th {(data.length)}>{data.id}</th>
 							<td>{data.date}</td>
 							<td>{data.strain}</td>
 							<td>{data.state}</td>
