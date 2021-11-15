@@ -270,6 +270,12 @@
 	});
 	let iconAsc = '↑';
 	let iconDesc = '↓';
+
+	const onKeyPress = e => {
+    if (e.charCode === 13) submit(page);
+  };
+
+//   $: filteredList = $Data.filter(item => item.name.indexOf(searchTerm) !== -1);
 </script>
 
 <Hidden bind:this={child} />
@@ -294,7 +300,8 @@
 						<div class="dropdown-trigger">
 							<!-- <button class="button" aria-haspopup="true" aria-controls="dropdown-menu4"> -->
 							<input
-								class="input is-dark mr-2"
+								class="input is-dark mr-2" 
+								on:keypress={onKeyPress} 
 								bind:value={strain}
 								type="text"
 								placeholder="Strain"
@@ -318,7 +325,8 @@
 						<div class="dropdown-trigger">
 							<!-- <button class="button" aria-haspopup="true" aria-controls="dropdown-menu4"> -->
 							<input
-								class="input is-dark mr-2"
+								class="input is-dark mr-2" 
+								on:keypress={onKeyPress} 
 								bind:value={state}
 								type="text"
 								placeholder="State"
@@ -342,7 +350,8 @@
 						<div class="dropdown-trigger">
 							<!-- <button class="button" aria-haspopup="true" aria-controls="dropdown-menu4"> -->
 							<input
-								class="input is-dark mr-2"
+								class="input is-dark mr-2" 
+								on:keypress={onKeyPress}
 								bind:value={lineage}
 								type="text"
 								placeholder="Lineage"
@@ -366,7 +375,8 @@
 						<div class="dropdown-trigger">
 							<!-- <button class="button" aria-haspopup="true" aria-controls="dropdown-menu4"> -->
 							<input
-								class="input is-dark mr-2"
+								class="input is-dark mr-2" 
+								on:keypress={onKeyPress}
 								bind:value={mutation_deletion}
 								type="text"
 								placeholder="Mutaion & Deletion"
@@ -390,7 +400,8 @@
 						<div class="dropdown-trigger">
 							<!-- <button class="button" aria-haspopup="true" aria-controls="dropdown-menu4"> -->
 							<input
-								class="input is-dark mr-2"
+								class="input is-dark mr-2" 
+								on:keypress={onKeyPress}
 								bind:value={date}
 								type="text"
 								placeholder="YYYY_MM_DD"
@@ -412,7 +423,7 @@
 				<div class="column-2">
 					<div>
 						<div class="select mr-2">
-							<select class="is-clickable" bind:value={days} name="days">
+							<select class="is-clickable" on:keypress={onKeyPress} bind:value={days} name="days">
 								<option value={days} name="days">All data</option>
 								<option value="7">Last week</option>
 								<option value="14">Last 2 weeks</option>
@@ -454,7 +465,8 @@
 							<div class="dropdown-trigger">
 								<!-- <button class="button" aria-haspopup="true" aria-controls="dropdown-menu4"> -->
 								<input
-									class="input is-dark mr-2"
+									class="input is-dark mr-2" 
+									on:keypress={onKeyPress}
 									bind:value={gene}
 									type="text"
 									placeholder="Gene"
@@ -478,7 +490,8 @@
 						<div class="dropdown-trigger">
 							<!-- <button class="button" aria-haspopup="true" aria-controls="dropdown-menu4"> -->
 							<input
-								class="input is-dark mr-2"
+								class="input is-dark mr-2" 
+								on:keypress={onKeyPress}
 								bind:value={reference_id}
 								type="text"
 								placeholder="Reference Rd"
@@ -502,7 +515,8 @@
 							<div class="dropdown-trigger">
 								<!-- <button class="button" aria-haspopup="true" aria-controls="dropdown-menu4"> -->
 								<input
-									class="input is-dark mr-2"
+									class="input is-dark mr-2" 
+									on:keypress={onKeyPress}
 									bind:value={amino_acid_position}
 									type="text"
 									placeholder="Amino position"
@@ -526,7 +540,9 @@
 							<div class="dropdown-trigger">
 								<!-- <button class="button" aria-haspopup="true" aria-controls="dropdown-menu4"> -->
 								<input
-									class="input is-dark mr-2"
+									class="input is-dark mr-2" 
+									on:keypress={onKeyPress} 
+									on:input={submit(page)}
 									bind:value={mutation}
 									type="text"
 									placeholder="Mutation"
@@ -870,7 +886,7 @@
 				<tbody class="has-text-centered is-info" id="body">
 					{#each $Data as data}
 						<tr>
-							<!-- <th scope="row">{data.id}</th> -->
+							<th {(data.length)}>{data.id}</th>
 							<td>{data.date}</td>
 							<td>{data.strain}</td>
 							<td>{data.state}</td>
